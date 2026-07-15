@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+*.pnp
+.pnp.js
+
+# Production & Build
+dist/
+dist-ssr/
+build/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+
+# IDE & Editor
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+*.iws
+*.ipr
+*.sublime-workspace
+*.sublime-project
+.vs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE metadata
+.editorconfig
+.eslintcache
+.stylelintcache
+
+# Optional npm cache
+.npm
+
+# Turbo
+.turbo/
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDEs
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
