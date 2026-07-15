@@ -31,7 +31,7 @@ function Card({ title, subtitle, hint }: CardProps) {
 
 export default function TradingEcosystem(): React.JSX.Element {
   return (
-    <section className="mx-auto max-w-6xl px-6 pb-20 pt-16 sm:px-8 lg:px-10">
+    <section id="course" className="scroll-mt-28 mx-auto max-w-6xl px-6 pb-20 pt-16 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-3xl text-center">
         <span className="inline-block rounded-full bg-violet-900/30 px-3 py-1 text-sm font-medium text-violet-300">
           Mission &amp; Vision

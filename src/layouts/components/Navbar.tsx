@@ -1,11 +1,11 @@
 ﻿import { useState } from 'react'
 import { Menu, X, ArrowRight } from 'lucide-react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const navItems = [
-  { name: 'Course', href: '/course' },
-  { name: 'Community', href: '/community' },
-  { name: 'Pricing', href: '/pricing' },
+  { name: 'Course', href: '#course' },
+  { name: 'Community', href: '#community' },
+  { name: 'Pricing', href: '#pricing' },
 ]
 
 export default function Navbar() {
@@ -20,17 +20,13 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
-            <NavLink
+            <a
               key={item.name}
-              to={item.href}
-              className={({ isActive }) =>
-                `text-sm font-medium tracking-[0.12em] transition-all duration-200 ${
-                  isActive ? 'text-violet-300' : 'text-zinc-300 hover:text-white'
-                }`
-              }
+              href={item.href}
+              className="text-sm font-medium tracking-[0.12em] text-zinc-300 transition-all duration-200 hover:text-white"
             >
               {item.name}
-            </NavLink>
+            </a>
           ))}
         </div>
 
@@ -61,14 +57,14 @@ export default function Navbar() {
         <div className="mx-auto mt-3 max-w-7xl rounded-3xl border border-white/10 bg-[#08080D]/95 p-5 backdrop-blur-2xl shadow-[0_30px_80px_rgba(0,0,0,0.24)] md:hidden">
           <div className="flex flex-col gap-4">
             {navItems.map((item) => (
-              <NavLink
+              <a
                 key={item.name}
-                to={item.href}
+                href={item.href}
                 onClick={() => setMobileOpen(false)}
                 className="text-base font-medium tracking-[0.12em] text-zinc-300 transition hover:text-white"
               >
                 {item.name}
-              </NavLink>
+              </a>
             ))}
             <div className="mt-3 h-px bg-white/10" />
             <Link
