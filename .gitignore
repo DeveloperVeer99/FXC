@@ -1,3 +1,7 @@
+# AI / Editor agent data
+.qodo/
+.amazonq/
+
 # Dependencies
 node_modules/
 *.pnp

@@ -1,90 +1,130 @@
-﻿import { useState } from 'react'
-import { Menu, X, ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Menu, X, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-const navItems = [
-  { name: 'Course', href: '#course' },
-  { name: 'Community', href: '#community' },
-  { name: 'Pricing', href: '#pricing' },
+const navLinks = [
+  { label: 'Course', href: '#course' },
+  { label: 'Community', href: '#community' },
+  { label: 'Pricing', href: '#pricing' },
 ]
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <header className="fixed inset-x-0 top-5 z-50 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-full border border-white/10 bg-black/50 px-5 py-3 backdrop-blur-2xl shadow-[0_30px_90px_rgba(0,0,0,0.25)]">
-        <Link to="/" className="text-sm font-semibold uppercase tracking-[0.35em] text-white">
-          FXC
-        </Link>
-
-        <div className="hidden items-center gap-8 md:flex">
-          {navItems.map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="text-sm font-medium tracking-[0.12em] text-zinc-300 transition-all duration-200 hover:text-white"
-            >
-              {item.name}
-            </a>
-          ))}
-        </div>
-
-        <div className="hidden items-center gap-4 md:flex">
-          <Link to="/login" className="text-sm font-medium text-zinc-400 transition hover:text-white">
-            Sign In
-          </Link>
-          <Link
-            to="/signup"
-            className="inline-flex items-center gap-2 rounded-full bg-violet-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(124,58,237,0.25)] transition duration-200 hover:bg-violet-400"
-          >
-            Get Started
-            <ArrowRight size={16} />
-          </Link>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition hover:bg-white/10 md:hidden"
-          aria-label="Toggle navigation"
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+    <>
+      {/* Announcement Banner */}
+      <div className="flex items-center justify-center gap-3 bg-violet-700 px-4 py-2 text-center">
+        <span className="text-xs text-white/80 uppercase tracking-widest">Limited Seats Available</span>
+        <span className="rounded bg-white px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-violet-700">
+          Enroll Now
+        </span>
+        <span className="hidden sm:block text-xs text-white/70">Only a few spots left this batch</span>
       </div>
 
-      {mobileOpen && (
-        <div className="mx-auto mt-3 max-w-7xl rounded-3xl border border-white/10 bg-[#08080D]/95 p-5 backdrop-blur-2xl shadow-[0_30px_80px_rgba(0,0,0,0.24)] md:hidden">
-          <div className="flex flex-col gap-4">
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-base font-medium tracking-[0.12em] text-zinc-300 transition hover:text-white"
+      {/* Floating Navbar wrapper */}
+      <div className="sticky top-0 z-50 flex justify-center px-4 pt-3 pb-1 sm:px-6">
+        <header
+          className={`w-full max-w-5xl rounded-2xl transition-all duration-500 ${
+            scrolled
+              ? 'border border-violet-500/20 bg-[#0a0a14]/85 backdrop-blur-2xl shadow-[0_0_0_1px_rgba(139,92,246,0.08),0_8px_40px_rgba(0,0,0,0.6),0_0_80px_rgba(124,58,237,0.08)]'
+              : 'border border-white/[0.07] bg-white/[0.03] backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.3)]'
+          }`}
+        >
+          <nav className="flex h-14 items-center justify-between px-5 sm:px-6">
+
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-600 shadow-[0_0_12px_rgba(124,58,237,0.5)] group-hover:shadow-[0_0_18px_rgba(124,58,237,0.7)] transition-shadow">
+                <span className="text-[10px] font-black text-white tracking-tight">FXC</span>
+              </div>
+              <span className="text-sm font-semibold tracking-[0.12em] uppercase text-white">
+                FourXClub
+              </span>
+            </Link>
+
+            {/* Desktop Nav */}
+            <div className="hidden items-center md:flex">
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="relative px-4 py-2 text-sm font-medium text-zinc-400 transition-colors duration-150 hover:text-white group"
+                >
+                  {link.label}
+                  <span className="absolute inset-x-4 bottom-1.5 h-px scale-x-0 bg-violet-500 transition-transform duration-200 group-hover:scale-x-100 origin-left" />
+                </a>
+              ))}
+            </div>
+
+            {/* Desktop Right */}
+            <div className="hidden items-center gap-3 md:flex">
+              <Link
+                to="/login"
+                className="text-sm font-medium text-zinc-400 transition-colors hover:text-white px-2"
               >
-                {item.name}
-              </a>
-            ))}
-            <div className="mt-3 h-px bg-white/10" />
-            <Link
-              to="/login"
-              onClick={() => setMobileOpen(false)}
-              className="text-base font-medium text-zinc-300 transition hover:text-white"
+                Log In
+              </Link>
+              <Link
+                to="/signup"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)]"
+              >
+                Get Access <ArrowUpRight size={14} />
+              </Link>
+            </div>
+
+            {/* Mobile Toggle */}
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition hover:bg-white/10 hover:text-white md:hidden"
+              aria-label="Toggle menu"
             >
-              Sign In
-            </Link>
-            <Link
-              to="/signup"
-              onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center justify-center rounded-full bg-violet-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-400"
-            >
-              Get Started
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      )}
-    </header>
+              {mobileOpen ? <X size={16} /> : <Menu size={16} />}
+            </button>
+          </nav>
+
+          {/* Mobile Menu */}
+          {mobileOpen && (
+            <div className="border-t border-white/[0.06] px-4 py-4 flex flex-col gap-1 md:hidden">
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div className="mt-2 h-px bg-white/[0.06]" />
+              <div className="mt-2 flex flex-col gap-2">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg bg-violet-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-violet-500"
+                >
+                  Get Access
+                </Link>
+              </div>
+            </div>
+          )}
+        </header>
+      </div>
+    </>
   )
 }

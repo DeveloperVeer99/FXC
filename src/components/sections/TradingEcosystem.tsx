@@ -1,74 +1,177 @@
 import React from 'react'
-import { Check } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Activity, BookOpen, Users, ShieldCheck } from 'lucide-react'
 
-type CardProps = {
-  title: string
-  subtitle: string
-  hint?: string
-}
-
-function Card({ title, subtitle, hint }: CardProps) {
-  return (
-    <div className="group relative flex h-36 w-full flex-col justify-between gap-3 rounded-2xl border border-transparent bg-gradient-to-b from-[#081018]/60 to-[#07101a]/40 p-6 shadow-[0_10px_30px_rgba(4,6,12,0.6)] transition-all hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(7,9,18,0.7)] overflow-visible">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-md font-semibold text-white">{title}</h3>
-          <p className="mt-2 text-sm text-white/70">{subtitle}</p>
-        </div>
-      </div>
-      {hint && <div className="text-xs text-white/50">{hint}</div>}
-
-      <div className="absolute -top-3 -right-3 z-10 flex h-9 w-9 items-center justify-center">
-        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-violet-700/75 p-[1px] shadow-[0_8px_24px_rgba(99,102,241,0.12)]">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#071028]">
-            <Check className="h-3.5 w-3.5 text-white/95" />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+const cards = [
+  {
+    icon: Activity,
+    tag: 'Core Method',
+    title: 'Orderflow + Auction Theory',
+    body: 'You learn to read the actual buying and selling happening at every price — footprint charts, delta, cumulative volume — not lagging indicators. Combined with Auction Market Theory, you understand why price is at a level, not just that it is.',
+    wide: true,
+  },
+  {
+    icon: BookOpen,
+    tag: 'Structure',
+    title: 'Skill-First, No Shortcuts',
+    body: 'No signals. No copy-trading. Every concept is taught with the logic behind it so you can apply it independently in any market condition.',
+    wide: false,
+  },
+  {
+    icon: Users,
+    tag: 'Community',
+    title: 'Live Trading Floor',
+    body: 'Learn while markets are open. Watch real orderflow being read in real time, ask questions, and build the habit of process-driven execution.',
+    wide: false,
+  },
+  {
+    icon: ShieldCheck,
+    tag: 'Outcome',
+    title: 'Built for Prop Firm Traders',
+    body: 'The entire framework — entries, stops, sizing, consistency — is designed around passing prop firm evaluations and trading funded accounts with discipline.',
+    wide: true,
+  },
+]
 
 export default function TradingEcosystem(): React.JSX.Element {
   return (
-    <section id="course" className="scroll-mt-28 mx-auto max-w-6xl px-6 pb-20 pt-16 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-3xl text-center">
-        <span className="inline-block rounded-full bg-violet-900/30 px-3 py-1 text-sm font-medium text-violet-300">
-          Mission &amp; Vision
-        </span>
-        <h2 className="mt-6 text-3xl font-semibold leading-tight text-white sm:text-4xl">
-          A Trading Ecosystem
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base text-white/70">
-          At FourXclub, we teach skill-first trading by blending orderflow, auction theory, and modern options positioning —
-          a practical framework used by institutional traders.
-        </p>
-      </div>
+    <section id="course" className="scroll-mt-20 bg-black px-4 py-24 sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-6xl">
 
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Card
-          title="Real-Time Market Learning"
-          subtitle="Learn by observing markets as they move in real-time."
-          hint="Live ticks, volume, and context-driven commentary"
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-2xl text-center mb-14"
+        >
+          <div className="inline-flex items-center gap-2 rounded-md border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 mb-6">
+            <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">What FourXClub Is</span>
+          </div>
+          <h2 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
+            Not Another Trading Course
+          </h2>
+          <p className="mt-4 text-base text-zinc-400 leading-7">
+            Most courses teach patterns and indicators. We teach you to read the actual mechanics of price — the way institutions do.
+          </p>
+        </motion.div>
 
-        <Card
-          title="Focused Trading Community"
-          subtitle="Small, serious group of learners and practitioners."
-          hint="Peer reviews, trade critique, and accountability"
-        />
+        {/* Bento grid */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
-        <Card
-          title="Experienced Trader Access"
-          subtitle="Direct mentorship from active institutional traders."
-          hint="Office hours, live audits, and trade breakdowns"
-        />
+          {/* Card 1 — wide (spans 2 cols on lg) */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0 }}
+            className="group relative rounded-2xl border border-white/[0.08] bg-[#0d0d0d] p-7 lg:col-span-2 overflow-hidden hover:border-violet-500/25 transition-colors duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10">
+                  <Activity className="h-4 w-4 text-violet-400" />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-violet-500">{cards[0].tag}</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{cards[0].title}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">{cards[0].body}</p>
 
-        <Card
-          title="Skill Over Shortcuts"
-          subtitle="Build discipline and process-first trading habits."
-          hint="Method, risk control, and repeatable execution"
-        />
+              {/* Visual accent */}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {['Footprint Charts', 'Delta Analysis', 'CVD Divergence', 'Volume Profile', 'POC / VAH / VAL'].map((t) => (
+                  <span key={t} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] font-mono text-zinc-500">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 2 */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="group relative rounded-2xl border border-white/[0.08] bg-[#0d0d0d] p-7 overflow-hidden hover:border-violet-500/25 transition-colors duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10">
+                  <BookOpen className="h-4 w-4 text-violet-400" />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-violet-500">{cards[1].tag}</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">{cards[1].title}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">{cards[1].body}</p>
+            </div>
+          </motion.div>
+
+          {/* Card 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="group relative rounded-2xl border border-white/[0.08] bg-[#0d0d0d] p-7 overflow-hidden hover:border-violet-500/25 transition-colors duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10">
+                  <Users className="h-4 w-4 text-emerald-400" />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600">{cards[2].tag}</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">{cards[2].title}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">{cards[2].body}</p>
+
+              <div className="mt-5 flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-mono text-emerald-500 uppercase tracking-widest">Floor Active Now</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 4 — wide */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="group relative rounded-2xl border border-white/[0.08] bg-[#0d0d0d] p-7 sm:col-span-2 lg:col-span-2 overflow-hidden hover:border-violet-500/25 transition-colors duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-600/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10">
+                  <ShieldCheck className="h-4 w-4 text-violet-400" />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-violet-500">{cards[3].tag}</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{cards[3].title}</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">{cards[3].body}</p>
+
+              <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { v: 'Process', l: 'Over Prediction' },
+                  { v: 'Structure', l: 'Over Indicators' },
+                  { v: 'Consistency', l: 'Over Big Wins' },
+                  { v: 'Edge', l: 'Over Luck' },
+                ].map((item) => (
+                  <div key={item.v} className="rounded-lg border border-white/[0.06] bg-black/40 px-3 py-2.5 text-center">
+                    <div className="text-xs font-bold text-white">{item.v}</div>
+                    <div className="text-[10px] text-zinc-600 mt-0.5">{item.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+        </div>
       </div>
     </section>
   )
