@@ -15,21 +15,13 @@ export default defineConfig({
   },
   build: {
     target: 'es2020',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
-      },
-    },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'router': ['react-router-dom'],
-          'motion': ['framer-motion'],
-          'icons': ['lucide-react'],
+        manualChunks(id) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) return 'react-vendor'
+          if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/react-router/')) return 'router'
+          if (id.includes('node_modules/framer-motion')) return 'motion'
+          if (id.includes('node_modules/lucide-react')) return 'icons'
         },
       },
     },

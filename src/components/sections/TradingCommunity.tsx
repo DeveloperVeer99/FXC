@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Check, MessageSquare, ArrowUpRight } from 'lucide-react'
 
-export default function TradingCommunity(): React.JSX.Element {
+export default function TradingCommunity() {
   const referralCode = 'REF-V4B5JI'
   const [copied, setCopied] = useState(false)
 

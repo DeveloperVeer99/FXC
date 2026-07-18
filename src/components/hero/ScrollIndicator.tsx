@@ -1,7 +1,6 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 
-export default function ScrollIndicator(): React.JSX.Element {
+export default function ScrollIndicator() {
   return (
     <div className="absolute inset-x-0 bottom-10 flex justify-center">
       <motion.div

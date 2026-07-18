@@ -1,8 +1,7 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, ArrowRight } from 'lucide-react'
 
-export default function LiveTradingBanner(): React.JSX.Element {
+export default function LiveTradingBanner() {
   return (
     <section className="relative overflow-hidden bg-[#030308] px-6 py-32 sm:px-10 lg:px-14">
 

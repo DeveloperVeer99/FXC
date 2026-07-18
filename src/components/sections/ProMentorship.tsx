@@ -1,4 +1,3 @@
-import React from 'react'
 import { Check, ArrowUpRight, BarChart2, Zap, Target } from 'lucide-react'
 
 const perks = [
@@ -27,7 +26,7 @@ const features = [
   },
 ]
 
-export default function ProMentorship(): React.JSX.Element {
+export default function ProMentorship() {
   return (
     <section className="bg-black px-6 py-24 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">

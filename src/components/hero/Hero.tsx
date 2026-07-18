@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, lazy, Suspense } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
 import { ArrowUpRight, ArrowRight, BarChart2, Layers, TrendingUp, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'

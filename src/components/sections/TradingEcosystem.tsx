@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import { Activity, BookOpen, Users, ShieldCheck } from 'lucide-react'
 
@@ -33,7 +32,7 @@ const cards = [
   },
 ]
 
-export default function TradingEcosystem(): React.JSX.Element {
+export default function TradingEcosystem() {
   return (
     <section id="course" className="scroll-mt-20 bg-black px-4 py-24 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState, type MouseEvent } from 'react'
 import { motion } from 'framer-motion'
 import { Check, ArrowUpRight } from 'lucide-react'
 
@@ -39,7 +39,7 @@ function SpotlightCard({ plan }: { plan: typeof plans[0] }) {
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const [hovered, setHovered] = useState(false)
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const rect = cardRef.current?.getBoundingClientRect()
     if (!rect) return
     setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
@@ -112,7 +112,7 @@ function SpotlightCard({ plan }: { plan: typeof plans[0] }) {
   )
 }
 
-export default function PlansPricing(): React.JSX.Element {
+export default function PlansPricing() {
   return (
     <section id="pricing" className="scroll-mt-20 bg-black px-6 py-24 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
