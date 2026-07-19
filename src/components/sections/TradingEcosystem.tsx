@@ -45,7 +45,7 @@ export default function TradingEcosystem() {
           className="mx-auto max-w-2xl text-center mb-14"
         >
           <div className="inline-flex items-center gap-2 rounded-md border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 mb-6">
-            <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">What FourXClub Is</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">What FXC Is</span>
           </div>
           <h2 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
             Not Another Trading Course

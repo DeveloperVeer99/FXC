@@ -46,7 +46,7 @@ export default function Navbar() {
                 <span className="text-[10px] font-black text-white tracking-tight">FXC</span>
               </div>
               <span className="text-sm font-semibold tracking-[0.12em] uppercase text-white">
-                FourXClub
+                FXC
               </span>
             </Link>
 

@@ -117,7 +117,7 @@ export default function Hero(): React.JSX.Element {
 
           {/* Subheadline */}
           <p className="max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg sm:leading-8">
-            FourXClub teaches institutional-grade orderflow, auction market theory, and optionflow —
+            FXC teaches institutional-grade orderflow, auction market theory, and optionflow —
             the same tools professional traders use to read real market structure and execute with edge.
           </p>
 

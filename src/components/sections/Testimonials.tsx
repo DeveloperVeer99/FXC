@@ -2,7 +2,7 @@ const testimonials = [
   {
     name: 'Arjun M.',
     role: 'Prop Trader, Mumbai',
-    text: 'FourXClub completely changed how I read the market. The orderflow sessions are unlike anything on YouTube — this is real institutional knowledge.',
+    text: 'FXC completely changed how I read the market. The orderflow sessions are unlike anything on YouTube — this is real institutional knowledge.',
     rating: 5,
   },
   {
@@ -51,7 +51,7 @@ export default function Testimonials() {
             Traders Who{' '}
             <span className="text-violet-400">Leveled Up</span>
           </h2>
-          <p className="mt-4 text-base text-zinc-400">Real results from real traders in the FourXClub ecosystem.</p>
+          <p className="mt-4 text-base text-zinc-400">Real results from real traders in the FXC ecosystem.</p>
         </div>
       </div>
 

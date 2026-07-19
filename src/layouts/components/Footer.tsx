@@ -14,7 +14,7 @@ export default function Footer() {
                 <span className="text-[10px] font-black text-white tracking-tight">FXC</span>
               </div>
               <span className="text-sm font-semibold tracking-[0.12em] uppercase text-white">
-                FourXClub
+                FXC
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-zinc-400 leading-6">
@@ -42,7 +42,7 @@ export default function Footer() {
             <div className="space-y-3">
               <a href="#" className="block text-sm text-zinc-400 hover:text-white transition">Instagram</a>
               <a href="https://discord.gg/vrHwGxE3VA" target="_blank" rel="noreferrer" className="block text-sm text-zinc-400 hover:text-white transition">Discord</a>
-              <a href="mailto:contact@fourxclub.com" className="block text-sm text-zinc-400 hover:text-white transition">Email</a>
+              <a href="mailto:contact@fxc.com" className="block text-sm text-zinc-400 hover:text-white transition">Email</a>
             </div>
           </div>
 
@@ -58,7 +58,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/[0.08] pt-8 text-xs text-zinc-600 md:flex-row">
-          <p>© 2026 FourXClub. All rights reserved.</p>
+          <p>© 2026 FXC. All rights reserved.</p>
           <p>Tools for futures, currency & options involves substantial risk. Only risk capital should be used for trading.</p>
         </div>
 

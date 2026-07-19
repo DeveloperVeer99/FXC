@@ -22,7 +22,7 @@ export default function TradingCommunity() {
             <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">Community</span>
           </div>
           <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Join the FourXclub{' '}
+            Join the FXC{' '}
             <span className="text-violet-400">Trading Community</span>
           </h2>
           <p className="mt-4 text-base text-zinc-400">
