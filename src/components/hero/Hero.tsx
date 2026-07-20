@@ -105,14 +105,13 @@ export default function Hero(): React.JSX.Element {
 
           {/* Main headline */}
           <h1 className="max-w-4xl text-5xl font-bold leading-[1.06] tracking-tight sm:text-6xl lg:text-7xl">
-            Trade What The{' '}
-            <span className="relative inline-block">
-              <span className="relative z-10 bg-gradient-to-r from-violet-400 to-violet-300 bg-clip-text text-transparent font-mono">
+            <span className="block">Trade What The</span>
+            <span className="relative block">
+              <span className="relative z-10 bg-gradient-to-r from-violet-400 to-violet-300 bg-clip-text text-transparent font-bold">
                 {scrambled}
               </span>
             </span>
-            <br />
-            <span className="text-zinc-500">Not What You Think.</span>
+            <span className="block text-zinc-500">Not What You Think.</span>
           </h1>
 
           {/* Subheadline */}
