@@ -1,0 +1,35 @@
+SHOPIFY INTEGRATION - QUICK START
+==================================
+
+1. GET SHOPIFY CREDENTIALS:
+   - Go to Shopify Admin → Settings → Apps and integrations → Develop apps
+   - Create app if needed
+   - Copy "Storefront API access token"
+   - Copy store URL (e.g., https://your-store.myshopify.com)
+
+2. SET ENVIRONMENT VARIABLES (in fxc/.env):
+   VITE_SHOPIFY_STORE_URL=https://your-store.myshopify.com
+   VITE_SHOPIFY_STOREFRONT_TOKEN=your-token-here
+
+3. CREATE PRODUCTS IN SHOPIFY:
+   - Product Title: Course name
+   - Price: Set in variant
+   - Description: Course details
+   - Images: Course cover image
+   - Tags: Add tag "plan" (IMPORTANT!)
+   - Status: Active
+   
+4. TEST LOCALLY:
+   npm run dev
+   
+5. DEPLOY:
+   Vercel: npm install -g vercel && vercel
+   Netlify: npm install -g netlify-cli && netlify deploy --prod
+   
+6. ADD ENV VARS TO DEPLOYMENT PLATFORM
+
+THAT'S IT! 
+- Courses from Shopify automatically appear on "Plans & Pricing" section
+- Users click "Get Started" → redirects to Shopify checkout
+- Shopify handles payments
+- Manage everything from Shopify dashboard

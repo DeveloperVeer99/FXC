@@ -6,7 +6,7 @@ const Curriculum       = lazy(() => import('@/components/sections/Curriculum'))
 const ProMentorship    = lazy(() => import('@/components/sections/ProMentorship'))
 const TradingCommunity = lazy(() => import('@/components/sections/TradingCommunity'))
 const Testimonials     = lazy(() => import('@/components/sections/Testimonials'))
-const PlansPricing     = lazy(() => import('@/components/sections/PlansPricing'))
+const ShopifyPlans     = lazy(() => import('@/components/sections/ShopifyPlans'))
 const LiveTradingBanner = lazy(() => import('@/components/sections/LiveTradingBanner'))
 
 export default function Home(): React.JSX.Element {
@@ -19,7 +19,7 @@ export default function Home(): React.JSX.Element {
         <ProMentorship />
         <TradingCommunity />
         <Testimonials />
-        <PlansPricing />
+        <ShopifyPlans />
         <LiveTradingBanner />
       </Suspense>
     </>
