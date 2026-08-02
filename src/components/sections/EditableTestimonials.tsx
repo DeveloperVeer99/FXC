@@ -1,9 +1,14 @@
+import { useEffect, useState } from 'react'
 import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../EditableWrapper'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 interface TestimonialData {
   introText: string;
+}
+
+const defaultTestimonialData: TestimonialData = {
+  introText: 'Real results from real traders in the FXC ecosystem.',
 }
 
 const testimonials = [
@@ -65,9 +70,20 @@ function TestimonialCard({ name, role, text, rating }: typeof testimonials[0]) {
 }
 
 export default function EditableTestimonials() {
-  const [testimonialData] = useSessionStorage<TestimonialData>('testimonialsData', {
-    introText: 'Real results from real traders in the FXC ecosystem.',
-  })
+  const [testimonialData, setTestimonialData] = useState<TestimonialData>(defaultTestimonialData)
+
+  useEffect(() => {
+    const fetchTestimonialData = async () => {
+      try {
+        const response = await api.get('/testimonials')
+        setTestimonialData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch testimonial data:', error)
+        setTestimonialData(defaultTestimonialData)
+      }
+    }
+    fetchTestimonialData()
+  }, [])
 
   const { setEditingItem } = useAdmin()
 

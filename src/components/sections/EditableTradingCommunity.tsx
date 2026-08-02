@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check, MessageSquare, ArrowUpRight } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../EditableWrapper'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 interface CommunityData {
   title: string;
@@ -11,13 +11,28 @@ interface CommunityData {
   referralCode: string;
 }
 
+const defaultCommunityData: CommunityData = {
+  title: 'Join the FXC Trading Community',
+  description: 'A private, well-moderated trading community for serious traders.',
+  discordLink: 'https://discord.gg/vrHwGxE3VA',
+  referralCode: 'REF-V4B5JI',
+}
+
 export default function EditableTradingCommunity() {
-  const [communityData] = useSessionStorage<CommunityData>('communityData', {
-    title: 'Join the FXC Trading Community',
-    description: 'A private, well-moderated trading community for serious traders.',
-    discordLink: 'https://discord.gg/vrHwGxE3VA',
-    referralCode: 'REF-V4B5JI',
-  })
+  const [communityData, setCommunityData] = useState<CommunityData>(defaultCommunityData)
+
+  useEffect(() => {
+    const fetchCommunityData = async () => {
+      try {
+        const response = await api.get('/community')
+        setCommunityData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch community data:', error)
+        setCommunityData(defaultCommunityData)
+      }
+    }
+    fetchCommunityData()
+  }, [])
 
   const [copied, setCopied] = useState(false)
   const { setEditingItem } = useAdmin()

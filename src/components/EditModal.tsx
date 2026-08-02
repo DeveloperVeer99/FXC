@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
-import { bannerAPI, coursesAPI } from '../services/api';
+import { bannerAPI, coursesAPI, footerAPI } from '../services/api';
+import api from '../services/api';
 
 interface EditModalProps {
   isOpen: boolean;
@@ -30,42 +31,41 @@ export const EditModal: React.FC<EditModalProps> = ({
   const handleSave = async () => {
     setLoading(true);
     try {
+      console.log('💾 Saving', itemType, 'data...');
+      
       if (itemType === 'banner') {
         await bannerAPI.update(formData);
-        // Reload only for database updates
-        window.location.reload();
       } else if (itemType === 'course') {
         if (formData._id) {
           await coursesAPI.update(formData._id, formData);
         } else {
           await coursesAPI.create(formData);
         }
-        // Reload only for database updates
-        window.location.reload();
-      } else {
-        // For sessionStorage-based sections, just update without reload
-        if (itemType === 'hero') {
-          sessionStorage.setItem('heroData', JSON.stringify(formData));
-        } else if (itemType === 'stats') {
-          sessionStorage.setItem('statsData', JSON.stringify(formData));
-        } else if (itemType === 'testimonials') {
-          sessionStorage.setItem('testimonialsData', JSON.stringify(formData));
-        } else if (itemType === 'community') {
-          sessionStorage.setItem('communityData', JSON.stringify(formData));
-        } else if (itemType === 'ecosystem') {
-          sessionStorage.setItem('ecosystemData', JSON.stringify(formData));
-        } else if (itemType === 'mentorship') {
-          sessionStorage.setItem('mentorshipData', JSON.stringify(formData));
-        } else if (itemType === 'footer') {
-          sessionStorage.setItem('footerData', JSON.stringify(formData));
-        }
+      } else if (itemType === 'hero') {
+        await api.put('/hero', formData);
+      } else if (itemType === 'stats') {
+        await api.put('/stats', formData);
+      } else if (itemType === 'ecosystem') {
+        await api.put('/ecosystem', formData);
+      } else if (itemType === 'testimonials') {
+        await api.put('/testimonials', formData);
+      } else if (itemType === 'community') {
+        await api.put('/community', formData);
+      } else if (itemType === 'mentorship') {
+        await api.put('/mentorship', formData);
+      } else if (itemType === 'footer') {
+        await footerAPI.update(formData);
       }
       
+      console.log('✅ Saved successfully!');
       setEditingItem(null);
       onClose();
-    } catch (error) {
-      console.error('Failed to save:', error);
-      alert('Failed to save. Please try again.');
+      // Reload to get fresh data from database
+      setTimeout(() => window.location.reload(), 300);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to save';
+      console.error('❌ Save error:', errorMsg, error);
+      alert('Failed to save. Error: ' + errorMsg);
     } finally {
       setLoading(false);
     }
@@ -209,7 +209,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                 onChange={(e) => handleChange('headline', e.target.value)}
                 rows={2}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., Trade What The [highlighted] Not What You Think."
               />
             </div>
             <div>
@@ -221,7 +220,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                 value={formData.highlightedText || ''}
                 onChange={(e) => handleChange('highlightedText', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., Market Shows."
               />
             </div>
             <div>
@@ -283,7 +281,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                 value={formData.averageRating || '4.9'}
                 onChange={(e) => handleChange('averageRating', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., 4.9"
               />
             </div>
           </div>
@@ -301,14 +298,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                 onChange={(e) => handleChange('introText', e.target.value)}
                 rows={2}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., Real results from real traders in the FXC ecosystem."
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Note: Edit testimonials in Home settings or backend
-              </label>
-              <p className="text-xs text-zinc-500">Testimonials are currently hardcoded. Contact admin to update backend.</p>
             </div>
           </div>
         );
@@ -322,7 +312,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.title || 'Join the FXC Trading Community'}
+                value={formData.title || ''}
                 onChange={(e) => handleChange('title', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -336,7 +326,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={2}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., A private, well-moderated trading community for serious traders."
               />
             </div>
             <div>
@@ -345,7 +334,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.discordLink || 'https://discord.gg/vrHwGxE3VA'}
+                value={formData.discordLink || ''}
                 onChange={(e) => handleChange('discordLink', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -356,7 +345,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.referralCode || 'REF-V4B5JI'}
+                value={formData.referralCode || ''}
                 onChange={(e) => handleChange('referralCode', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -373,7 +362,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.title || 'Not Another Trading Course'}
+                value={formData.title || ''}
                 onChange={(e) => handleChange('title', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -387,7 +376,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                 onChange={(e) => handleChange('subtitle', e.target.value)}
                 rows={2}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., Most courses teach patterns and indicators..."
               />
             </div>
           </div>
@@ -402,7 +390,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.title || 'Pro Mentorship'}
+                value={formData.title || ''}
                 onChange={(e) => handleChange('title', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -413,7 +401,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.price || '₹14,999'}
+                value={formData.price || ''}
                 onChange={(e) => handleChange('price', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -441,7 +429,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.companyName || 'FXC'}
+                value={formData.companyName || ''}
                 onChange={(e) => handleChange('companyName', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -452,7 +440,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="email"
-                value={formData.email || 'contact@fxc.com'}
+                value={formData.email || ''}
                 onChange={(e) => handleChange('email', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -474,7 +462,7 @@ export const EditModal: React.FC<EditModalProps> = ({
               </label>
               <input
                 type="text"
-                value={formData.copyrightText || '© 2026 FXC. All rights reserved.'}
+                value={formData.copyrightText || ''}
                 onChange={(e) => handleChange('copyrightText', e.target.value)}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
               />
@@ -488,7 +476,6 @@ export const EditModal: React.FC<EditModalProps> = ({
                 onChange={(e) => handleChange('disclaimerText', e.target.value)}
                 rows={2}
                 className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., Tools for futures, currency & options involves substantial risk..."
               />
             </div>
           </div>
@@ -521,6 +508,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                 Edit {itemType?.charAt(0).toUpperCase()}{itemType?.slice(1)}
               </h3>
               <button
+                type="button"
                 onClick={onClose}
                 className="text-zinc-400 hover:text-white transition"
               >
@@ -532,6 +520,7 @@ export const EditModal: React.FC<EditModalProps> = ({
 
             <div className="mt-6 flex gap-3">
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={loading}
                 className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-600 px-4 py-2 rounded-md text-white font-semibold transition"
@@ -539,6 +528,7 @@ export const EditModal: React.FC<EditModalProps> = ({
                 {loading ? 'Saving...' : 'Save'}
               </button>
               <button
+                type="button"
                 onClick={onClose}
                 className="flex-1 border border-zinc-600 hover:bg-zinc-800 px-4 py-2 rounded-md text-white font-semibold transition"
               >

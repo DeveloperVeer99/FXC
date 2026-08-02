@@ -1,7 +1,8 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../../components/EditableWrapper'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 interface FooterData {
   companyName: string;
@@ -11,14 +12,29 @@ interface FooterData {
   disclaimerText: string;
 }
 
+const defaultFooterData: FooterData = {
+  companyName: 'FXC',
+  email: 'contact@fxc.com',
+  phone: '',
+  copyrightText: '© 2026 FXC. All rights reserved.',
+  disclaimerText: 'Tools for futures, currency & options involves substantial risk. Only risk capital should be used for trading.',
+}
+
 export default function EditableFooter() {
-  const [footerData] = useSessionStorage<FooterData>('footerData', {
-    companyName: 'FXC',
-    email: 'contact@fxc.com',
-    phone: '',
-    copyrightText: '© 2026 FXC. All rights reserved.',
-    disclaimerText: 'Tools for futures, currency & options involves substantial risk. Only risk capital should be used for trading.',
-  })
+  const [footerData, setFooterData] = useState<FooterData>(defaultFooterData)
+
+  useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const response = await api.get('/footer')
+        setFooterData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch footer data:', error)
+        setFooterData(defaultFooterData)
+      }
+    }
+    fetchFooterData()
+  }, [])
 
   const { setEditingItem } = useAdmin()
 

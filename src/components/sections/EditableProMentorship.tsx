@@ -1,12 +1,19 @@
+import { useEffect, useState } from 'react'
 import { Check, ArrowUpRight, BarChart2, Zap, Target } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../EditableWrapper'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 interface MentorshipData {
   title: string;
   price: string;
   description: string;
+}
+
+const defaultMentorshipData: MentorshipData = {
+  title: 'Pro Mentorship',
+  price: '₹14,999',
+  description: 'For serious traders aiming for consistency through mathematical execution and auction theory.',
 }
 
 const perks = [
@@ -36,11 +43,20 @@ const features = [
 ]
 
 export default function EditableProMentorship() {
-  const [mentorshipData] = useSessionStorage<MentorshipData>('mentorshipData', {
-    title: 'Pro Mentorship',
-    price: '₹14,999',
-    description: 'For serious traders aiming for consistency through mathematical execution and auction theory.',
-  })
+  const [mentorshipData, setMentorshipData] = useState<MentorshipData>(defaultMentorshipData)
+
+  useEffect(() => {
+    const fetchMentorshipData = async () => {
+      try {
+        const response = await api.get('/mentorship')
+        setMentorshipData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch mentorship data:', error)
+        setMentorshipData(defaultMentorshipData)
+      }
+    }
+    fetchMentorshipData()
+  }, [])
 
   const { setEditingItem } = useAdmin()
 

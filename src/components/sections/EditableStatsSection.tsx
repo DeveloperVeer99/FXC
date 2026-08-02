@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../EditableWrapper'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 interface StatsData {
   activeLearnersValue: number;
@@ -25,6 +25,13 @@ function useCounter(target: number, duration = 1800, inView = false) {
     return () => clearInterval(timer)
   }, [inView, target, duration])
   return count
+}
+
+const defaultStatsData: StatsData = {
+  activeLearnersValue: 500,
+  completionRate: 98,
+  avgROI: 14,
+  averageRating: '4.9',
 }
 
 const candles = [
@@ -90,12 +97,20 @@ function StatCard({ value, suffix, label, sub, inView }: { value: number; suffix
 }
 
 export default function EditableStatsSection() {
-  const [statsData] = useSessionStorage<StatsData>('statsData', {
-    activeLearnersValue: 500,
-    completionRate: 98,
-    avgROI: 14,
-    averageRating: '4.9',
-  })
+  const [statsData, setStatsData] = useState<StatsData>(defaultStatsData)
+
+  useEffect(() => {
+    const fetchStatsData = async () => {
+      try {
+        const response = await api.get('/stats')
+        setStatsData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch stats data:', error)
+        setStatsData(defaultStatsData)
+      }
+    }
+    fetchStatsData()
+  }, [])
 
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })

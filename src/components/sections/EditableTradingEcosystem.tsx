@@ -1,12 +1,18 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Activity, BookOpen, Users, ShieldCheck } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../EditableWrapper'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 interface EcosystemData {
   title: string;
   subtitle: string;
+}
+
+const defaultEcosystemData: EcosystemData = {
+  title: 'Not Another Trading Course',
+  subtitle: 'Most courses teach patterns and indicators. We teach you to read the actual mechanics of price — the way institutions do.',
 }
 
 const cards = [
@@ -41,10 +47,20 @@ const cards = [
 ]
 
 export default function EditableTradingEcosystem() {
-  const [ecosystemData] = useSessionStorage<EcosystemData>('ecosystemData', {
-    title: 'Not Another Trading Course',
-    subtitle: 'Most courses teach patterns and indicators. We teach you to read the actual mechanics of price — the way institutions do.',
-  })
+  const [ecosystemData, setEcosystemData] = useState<EcosystemData>(defaultEcosystemData)
+
+  useEffect(() => {
+    const fetchEcosystemData = async () => {
+      try {
+        const response = await api.get('/ecosystem')
+        setEcosystemData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch ecosystem data:', error)
+        setEcosystemData(defaultEcosystemData)
+      }
+    }
+    fetchEcosystemData()
+  }, [])
 
   const { setEditingItem } = useAdmin()
 

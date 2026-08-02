@@ -6,7 +6,7 @@ import { useAdmin } from '../../context/AdminContext'
 import { EditableWrapper } from '../EditableWrapper'
 import HeroBackground from '../hero/HeroBackground'
 import ScrollIndicator from '../hero/ScrollIndicator'
-import { useSessionStorage } from '@/hooks'
+import api from '../../services/api'
 
 const tags = [
   { icon: BarChart2, label: 'Orderflow' },
@@ -52,11 +52,23 @@ function useScramble(target: string, trigger: boolean) {
 }
 
 export default function EditableHero(): React.JSX.Element {
-  const [heroData] = useSessionStorage<HeroData>('heroData', {
+  const [heroData, setHeroData] = useState<HeroData>({
     headline: 'Trade What The',
     highlightedText: 'Market Shows.',
     subheadline: 'FXC teaches institutional-grade orderflow, auction market theory, and optionflow — the same tools professional traders use to read real market structure and execute with edge.',
   })
+
+  useEffect(() => {
+    const fetchHeroData = async () => {
+      try {
+        const response = await api.get('/hero');
+        setHeroData(response.data);
+      } catch (error) {
+        console.error('Failed to fetch hero data:', error);
+      }
+    };
+    fetchHeroData();
+  }, []);
 
   const containerRef = useRef<HTMLElement>(null)
   const mouseX = useMotionValue(0)

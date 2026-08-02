@@ -20,6 +20,9 @@ api.interceptors.request.use((config) => {
   const token = sessionStorage.getItem('adminToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    console.log('🔐 Token added to request:', config.url);
+  } else {
+    console.warn('⚠️ No token found in sessionStorage');
   }
   return config;
 });
@@ -28,7 +31,17 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 503) {
+    console.error('❌ API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+    });
+    
+    if (error.response?.status === 401) {
+      console.error('🔴 Unauthorized - Token may be invalid');
+      sessionStorage.removeItem('adminToken');
+    } else if (error.response?.status === 503) {
       console.warn('⚠️ Backend service unavailable');
     } else if (error.code === 'ECONNABORTED') {
       console.warn('⚠️ Request timeout');
@@ -47,6 +60,42 @@ export const authAPI = {
 export const bannerAPI = {
   get: () => api.get('/banner'),
   update: (data: any) => api.put('/banner', data),
+};
+
+// Hero
+export const heroAPI = {
+  get: () => api.get('/hero'),
+  update: (data: any) => api.put('/hero', data),
+};
+
+// Stats
+export const statsAPI = {
+  get: () => api.get('/stats'),
+  update: (data: any) => api.put('/stats', data),
+};
+
+// Ecosystem
+export const ecosystemAPI = {
+  get: () => api.get('/ecosystem'),
+  update: (data: any) => api.put('/ecosystem', data),
+};
+
+// Testimonials
+export const testimonialsAPI = {
+  get: () => api.get('/testimonials'),
+  update: (data: any) => api.put('/testimonials', data),
+};
+
+// Community
+export const communityAPI = {
+  get: () => api.get('/community'),
+  update: (data: any) => api.put('/community', data),
+};
+
+// Mentorship
+export const mentorshipAPI = {
+  get: () => api.get('/mentorship'),
+  update: (data: any) => api.put('/mentorship', data),
 };
 
 // Footer
