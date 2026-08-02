@@ -3,31 +3,34 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
 import Home from "@/pages/Home";
 import NotFound from "@/pages/NotFound";
-import AdminDashboard from "@/pages/AdminDashboard";
 import { AdminLogin } from "@/components/AdminLogin";
 import { AdminProvider } from "@/context/AdminContext";
 import { EditModal } from "@/components/EditModal";
 import { useAdmin } from "@/context/AdminContext";
 import { authAPI } from "@/services/api";
 
-const AppContent: React.FC<{ isAdminLoggedIn: boolean; onAdminClick: () => void; onLogout: () => void }> = ({ isAdminLoggedIn, onAdminClick, onLogout }) => {
-  const { editingItem, setEditingItem, isAdminMode, setIsAdminMode } = useAdmin();
+const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (value: boolean) => void; onAdminClick: () => void; onLogout: () => void }> = ({ isAdminLoggedIn, setIsAdminLoggedIn, onAdminClick, onLogout }) => {
+  const { editingItem, setEditingItem, setIsAdminMode } = useAdmin();
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 
   useEffect(() => {
     setIsAdminMode(isAdminLoggedIn);
   }, [isAdminLoggedIn, setIsAdminMode]);
 
-  if (isAdminLoggedIn) {
-    return <AdminDashboard onLogout={onLogout} />;
-  }
+  const handleLogout = () => {
+    onLogout();
+    setIsAdminLoggedIn(false);
+  };
 
   return (
     <>
       <AdminLogin
         isOpen={showAdminLogin}
         onClose={() => setShowAdminLogin(false)}
-        onLoginSuccess={() => onAdminClick()}
+        onLoginSuccess={() => {
+          setIsAdminLoggedIn(true);
+          onAdminClick();
+        }}
       />
       <EditModal
         isOpen={editingItem !== null}
@@ -36,7 +39,16 @@ const AppContent: React.FC<{ isAdminLoggedIn: boolean; onAdminClick: () => void;
         itemData={editingItem?.data}
       />
       <Routes>
-        <Route path="/" element={<MainLayout onAdminClick={() => setShowAdminLogin(true)} isAdminLoggedIn={isAdminLoggedIn} />}>
+        <Route 
+          path="/" 
+          element={
+            <MainLayout 
+              onAdminClick={() => setShowAdminLogin(true)} 
+              isAdminLoggedIn={isAdminLoggedIn}
+              onLogout={handleLogout}
+            />
+          }
+        >
           <Route index element={<Home />} />
           <Route path="*" element={<NotFound />} />
         </Route>
@@ -62,18 +74,17 @@ const App: React.FC = () => {
     checkAuth();
   }, []);
 
-  const handleLogout = () => {
-    setIsAdminLoggedIn(false);
-    sessionStorage.removeItem('adminToken');
-  };
-
   return (
     <BrowserRouter>
       <AdminProvider>
         <AppContent
           isAdminLoggedIn={isAdminLoggedIn}
+          setIsAdminLoggedIn={setIsAdminLoggedIn}
           onAdminClick={() => setIsAdminLoggedIn(true)}
-          onLogout={handleLogout}
+          onLogout={() => {
+            setIsAdminLoggedIn(false);
+            sessionStorage.removeItem('adminToken');
+          }}
         />
       </AdminProvider>
     </BrowserRouter>

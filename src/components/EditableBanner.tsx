@@ -33,7 +33,6 @@ export default function EditableBanner() {
   const handleEdit = (data: BannerData) => {
     setEditingItem({
       type: 'banner',
-      id: data._id,
       data,
     });
   };
@@ -41,7 +40,6 @@ export default function EditableBanner() {
   return (
     <EditableWrapper
       type="banner"
-      id={banner._id}
       data={banner}
       onEdit={handleEdit}
     >

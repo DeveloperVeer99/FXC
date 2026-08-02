@@ -159,7 +159,6 @@ export default function EditablePlansPricing() {
   const handleEdit = (course: Course) => {
     setEditingItem({
       type: 'course',
-      id: course._id,
       data: course,
     })
   }

@@ -4,7 +4,6 @@ import { useAdmin } from '../context/AdminContext';
 
 interface EditableWrapperProps {
   type: 'banner' | 'course' | 'curriculum' | 'section';
-  id?: string;
   data: any;
   onEdit: (data: any) => void;
   children: React.ReactNode;
@@ -12,7 +11,6 @@ interface EditableWrapperProps {
 
 export const EditableWrapper: React.FC<EditableWrapperProps> = ({
   type,
-  id,
   data,
   onEdit,
   children,

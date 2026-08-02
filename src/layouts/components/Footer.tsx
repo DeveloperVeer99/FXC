@@ -1,32 +1,6 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { healthAPI } from '@/services/api'
 
 export default function Footer() {
-  const [mongoStatus, setMongoStatus] = useState<string>('⏳ Checking...')
-
-  useEffect(() => {
-    const checkHealth = async () => {
-      try {
-        const response = await healthAPI.check()
-        const mongo = response.data.mongodb
-        if (mongo?.includes('✅')) {
-          setMongoStatus('✅ MongoDB Connected')
-        } else if (mongo?.includes('❌')) {
-          setMongoStatus('❌ MongoDB Disconnected')
-        } else {
-          setMongoStatus('⏳ Connecting...')
-        }
-      } catch (err) {
-        setMongoStatus('❌ Connection Error')
-      }
-    }
-
-    checkHealth()
-    const interval = setInterval(checkHealth, 5000) // Check every 5 seconds
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <footer className="border-t border-white/8 bg-black text-white">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
@@ -57,6 +31,7 @@ export default function Footer() {
             <h3 className="mb-5 text-[11px] font-bold uppercase tracking-widest text-zinc-500">Product</h3>
             <div className="space-y-3">
               <button
+                type="button"
                 onClick={() => {
                   const el = document.getElementById('courses')
                   el?.scrollIntoView({ behavior: 'smooth' })
@@ -66,6 +41,7 @@ export default function Footer() {
                 Courses
               </button>
               <button
+                type="button"
                 onClick={() => {
                   const el = document.getElementById('community')
                   el?.scrollIntoView({ behavior: 'smooth' })
@@ -75,6 +51,7 @@ export default function Footer() {
                 Community
               </button>
               <button
+                type="button"
                 onClick={() => {
                   const el = document.getElementById('plans')
                   el?.scrollIntoView({ behavior: 'smooth' })
@@ -109,7 +86,6 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/8 pt-8 text-xs text-zinc-600 md:flex-row">
           <p>© 2026 FXC. All rights reserved.</p>
-          <p>{mongoStatus}</p>
           <p>Tools for futures, currency & options involves substantial risk. Only risk capital should be used for trading.</p>
         </div>
 

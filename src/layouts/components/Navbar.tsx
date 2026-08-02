@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Menu, X, ArrowUpRight } from 'lucide-react'
+import { Menu, X, ArrowUpRight, LogOut } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useAdmin } from '../../context/AdminContext'
 
 const navLinks = [
   { label: 'Course', id: 'courses' },
@@ -8,9 +9,15 @@ const navLinks = [
   { label: 'Pricing', id: 'plans' },
 ]
 
-export default function Navbar({ onAdminClick }: { onAdminClick?: () => void }) {
+interface NavbarProps {
+  onAdminClick?: () => void
+  onLogout?: () => void
+}
+
+export default function Navbar({ onAdminClick, onLogout }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { isAdminMode } = useAdmin()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -73,16 +80,32 @@ export default function Navbar({ onAdminClick }: { onAdminClick?: () => void }) 
               ))}
             </div>
 
-            {/* Desktop Right - Only Admin Button */}
+            {/* Desktop Right - Admin/Logout Button */}
             <div className="hidden items-center gap-3 md:flex">
-              <button
-                onClick={onAdminClick}
-                type="button"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)]"
-                title="Admin Dashboard"
-              >
-                🔐 Admin <ArrowUpRight size={14} />
-              </button>
+              {isAdminMode ? (
+                <>
+                  <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/30 px-3 py-1.5 text-xs font-semibold text-emerald-400">
+                    ✓ Admin Mode
+                  </div>
+                  <button
+                    onClick={onLogout}
+                    type="button"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-red-500"
+                    title="Logout"
+                  >
+                    <LogOut size={14} /> Logout
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={onAdminClick}
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)]"
+                  title="Admin Login"
+                >
+                  🔐 Admin <ArrowUpRight size={14} />
+                </button>
+              )}
             </div>
 
             {/* Mobile Toggle */}
@@ -111,17 +134,36 @@ export default function Navbar({ onAdminClick }: { onAdminClick?: () => void }) 
               ))}
               <div className="mt-2 h-px bg-white/6" />
               <div className="mt-2 flex flex-col gap-2">
-                <button
-                  onClick={() => {
-                    onAdminClick?.()
-                    setMobileOpen(false)
-                  }}
-                  type="button"
-                  className="rounded-lg bg-violet-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-violet-500"
-                  title="Admin Dashboard"
-                >
-                  🔐 Admin
-                </button>
+                {isAdminMode ? (
+                  <>
+                    <div className="rounded-lg bg-emerald-600/20 border border-emerald-500/30 px-4 py-2 text-center text-xs font-semibold text-emerald-400">
+                      ✓ Admin Mode Active
+                    </div>
+                    <button
+                      onClick={() => {
+                        onLogout?.()
+                        setMobileOpen(false)
+                      }}
+                      type="button"
+                      className="rounded-lg bg-red-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-red-500"
+                      title="Logout"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      onAdminClick?.()
+                      setMobileOpen(false)
+                    }}
+                    type="button"
+                    className="rounded-lg bg-violet-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-violet-500"
+                    title="Admin Login"
+                  >
+                    🔐 Admin
+                  </button>
+                )}
               </div>
             </div>
           )}
