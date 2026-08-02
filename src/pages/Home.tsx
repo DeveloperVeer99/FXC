@@ -1,27 +1,32 @@
-import React, { lazy, Suspense } from 'react'
+import React from 'react'
 import Hero from '@/components/hero/Hero'
-
-const TradingEcosystem = lazy(() => import('@/components/sections/TradingEcosystem'))
-const Curriculum       = lazy(() => import('@/components/sections/Curriculum'))
-const ProMentorship    = lazy(() => import('@/components/sections/ProMentorship'))
-const TradingCommunity = lazy(() => import('@/components/sections/TradingCommunity'))
-const Testimonials     = lazy(() => import('@/components/sections/Testimonials'))
-const ShopifyPlans     = lazy(() => import('@/components/sections/ShopifyPlans'))
-const LiveTradingBanner = lazy(() => import('@/components/sections/LiveTradingBanner'))
+import TradingEcosystem from '@/components/sections/TradingEcosystem'
+import Curriculum from '@/components/sections/Curriculum'
+import ProMentorship from '@/components/sections/ProMentorship'
+import TradingCommunity from '@/components/sections/TradingCommunity'
+import Testimonials from '@/components/sections/Testimonials'
+import EditableBanner from '@/components/EditableBanner'
+import EditablePlansPricing from '@/components/sections/EditablePlansPricing'
 
 export default function Home(): React.JSX.Element {
   return (
     <>
       <Hero />
-      <Suspense fallback={null}>
+      <section id="courses">
         <TradingEcosystem />
         <Curriculum />
         <ProMentorship />
+      </section>
+      <section id="community">
         <TradingCommunity />
         <Testimonials />
-        <ShopifyPlans />
-        <LiveTradingBanner />
-      </Suspense>
+      </section>
+      <section id="plans">
+        <EditablePlansPricing />
+      </section>
+      <section id="banner">
+        <EditableBanner />
+      </section>
     </>
   )
 }

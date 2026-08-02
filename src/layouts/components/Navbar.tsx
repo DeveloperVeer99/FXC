@@ -3,12 +3,12 @@ import { Menu, X, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const navLinks = [
-  { label: 'Course', href: '#course' },
-  { label: 'Community', href: '#community' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Course', id: 'courses' },
+  { label: 'Community', id: 'community' },
+  { label: 'Pricing', id: 'plans' },
 ]
 
-export default function Navbar() {
+export default function Navbar({ onAdminClick }: { onAdminClick?: () => void }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -17,6 +17,14 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setMobileOpen(false)
+    }
+  }
 
   return (
     <>
@@ -35,7 +43,7 @@ export default function Navbar() {
           className={`w-full max-w-5xl rounded-2xl transition-all duration-500 ${
             scrolled
               ? 'border border-violet-500/20 bg-[#0a0a14]/85 backdrop-blur-2xl shadow-[0_0_0_1px_rgba(139,92,246,0.08),0_8px_40px_rgba(0,0,0,0.6),0_0_80px_rgba(124,58,237,0.08)]'
-              : 'border border-white/[0.07] bg-white/[0.03] backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.3)]'
+              : 'border border-white/6 bg-white/3 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.3)]'
           }`}
         >
           <nav className="flex h-14 items-center justify-between px-5 sm:px-6">
@@ -53,31 +61,28 @@ export default function Navbar() {
             {/* Desktop Nav */}
             <div className="hidden items-center md:flex">
               {navLinks.map((link) => (
-                <a
+                <button
                   key={link.label}
-                  href={link.href}
-                  className="relative px-4 py-2 text-sm font-medium text-zinc-400 transition-colors duration-150 hover:text-white group"
+                  onClick={() => scrollToSection(link.id)}
+                  type="button"
+                  className="relative px-4 py-2 text-sm font-medium text-zinc-400 transition-colors duration-150 hover:text-white group bg-none border-none cursor-pointer"
                 >
                   {link.label}
                   <span className="absolute inset-x-4 bottom-1.5 h-px scale-x-0 bg-violet-500 transition-transform duration-200 group-hover:scale-x-100 origin-left" />
-                </a>
+                </button>
               ))}
             </div>
 
-            {/* Desktop Right */}
+            {/* Desktop Right - Only Admin Button */}
             <div className="hidden items-center gap-3 md:flex">
-              <Link
-                to="/login"
-                className="text-sm font-medium text-zinc-400 transition-colors hover:text-white px-2"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/signup"
+              <button
+                onClick={onAdminClick}
+                type="button"
                 className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.4)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)]"
+                title="Admin Dashboard"
               >
-                Get Access <ArrowUpRight size={14} />
-              </Link>
+                🔐 Admin <ArrowUpRight size={14} />
+              </button>
             </div>
 
             {/* Mobile Toggle */}
@@ -85,7 +90,7 @@ export default function Navbar() {
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
               className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition hover:bg-white/10 hover:text-white md:hidden"
-              aria-label="Toggle menu"
+              title="Toggle menu"
             >
               {mobileOpen ? <X size={16} /> : <Menu size={16} />}
             </button>
@@ -93,33 +98,30 @@ export default function Navbar() {
 
           {/* Mobile Menu */}
           {mobileOpen && (
-            <div className="border-t border-white/[0.06] px-4 py-4 flex flex-col gap-1 md:hidden">
+            <div className="border-t border-white/6 px-4 py-4 flex flex-col gap-1 md:hidden">
               {navLinks.map((link) => (
-                <a
+                <button
                   key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/5 hover:text-white"
+                  onClick={() => scrollToSection(link.id)}
+                  type="button"
+                  className="rounded-lg px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/5 hover:text-white w-full text-left bg-none border-none cursor-pointer"
                 >
                   {link.label}
-                </a>
+                </button>
               ))}
-              <div className="mt-2 h-px bg-white/[0.06]" />
+              <div className="mt-2 h-px bg-white/6" />
               <div className="mt-2 flex flex-col gap-2">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-zinc-400 transition hover:bg-white/5 hover:text-white"
-                >
-                  Log In
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setMobileOpen(false)}
+                <button
+                  onClick={() => {
+                    onAdminClick?.()
+                    setMobileOpen(false)
+                  }}
+                  type="button"
                   className="rounded-lg bg-violet-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-violet-500"
+                  title="Admin Dashboard"
                 >
-                  Get Access
-                </Link>
+                  🔐 Admin
+                </button>
               </div>
             </div>
           )}

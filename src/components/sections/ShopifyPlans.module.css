@@ -1,7 +1,0 @@
-.spotlight {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  transition: opacity 300ms;
-}
-
