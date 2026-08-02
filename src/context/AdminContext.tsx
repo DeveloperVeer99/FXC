@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface EditableItem {
   type: 'banner' | 'course' | 'curriculum' | 'section';
-  id?: string;
   data: any;
 }
 
@@ -21,10 +20,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [editingItem, setEditingItem] = useState<EditableItem | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Update isEditing when editingItem changes
-  React.useEffect(() => {
+  useEffect(() => {
     setIsEditing(editingItem !== null);
   }, [editingItem]);
+
+  // Reset editing when admin mode turns off
+  useEffect(() => {
+    if (!isAdminMode) {
+      setEditingItem(null);
+    }
+  }, [isAdminMode]);
 
   return (
     <AdminContext.Provider

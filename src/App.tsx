@@ -9,7 +9,7 @@ import { EditModal } from "@/components/EditModal";
 import { useAdmin } from "@/context/AdminContext";
 import { authAPI } from "@/services/api";
 
-const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (value: boolean) => void; onAdminClick: () => void; onLogout: () => void }> = ({ isAdminLoggedIn, setIsAdminLoggedIn, onAdminClick, onLogout }) => {
+const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (value: boolean) => void }> = ({ isAdminLoggedIn, setIsAdminLoggedIn }) => {
   const { editingItem, setEditingItem, setIsAdminMode } = useAdmin();
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 
@@ -17,9 +17,15 @@ const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (valu
     setIsAdminMode(isAdminLoggedIn);
   }, [isAdminLoggedIn, setIsAdminMode]);
 
+  const handleLoginSuccess = () => {
+    setIsAdminLoggedIn(true);
+    setShowAdminLogin(false);
+  };
+
   const handleLogout = () => {
-    onLogout();
     setIsAdminLoggedIn(false);
+    sessionStorage.removeItem('adminToken');
+    setEditingItem(null);
   };
 
   return (
@@ -27,10 +33,7 @@ const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (valu
       <AdminLogin
         isOpen={showAdminLogin}
         onClose={() => setShowAdminLogin(false)}
-        onLoginSuccess={() => {
-          setIsAdminLoggedIn(true);
-          onAdminClick();
-        }}
+        onLoginSuccess={handleLoginSuccess}
       />
       <EditModal
         isOpen={editingItem !== null}
@@ -43,8 +46,7 @@ const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (valu
           path="/" 
           element={
             <MainLayout 
-              onAdminClick={() => setShowAdminLogin(true)} 
-              isAdminLoggedIn={isAdminLoggedIn}
+              onAdminClick={() => setShowAdminLogin(true)}
               onLogout={handleLogout}
             />
           }
@@ -80,11 +82,6 @@ const App: React.FC = () => {
         <AppContent
           isAdminLoggedIn={isAdminLoggedIn}
           setIsAdminLoggedIn={setIsAdminLoggedIn}
-          onAdminClick={() => setIsAdminLoggedIn(true)}
-          onLogout={() => {
-            setIsAdminLoggedIn(false);
-            sessionStorage.removeItem('adminToken');
-          }}
         />
       </AdminProvider>
     </BrowserRouter>

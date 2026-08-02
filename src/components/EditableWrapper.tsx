@@ -10,7 +10,6 @@ interface EditableWrapperProps {
 }
 
 export const EditableWrapper: React.FC<EditableWrapperProps> = ({
-  type,
   data,
   onEdit,
   children,
