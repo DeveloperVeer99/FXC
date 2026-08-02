@@ -1,7 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Navbar from '@/layouts/components/Navbar'
-import Footer from '@/layouts/components/Footer'
+import EditableFooter from '@/layouts/components/EditableFooter'
 
 const MainLayout: React.FC<{ onAdminClick?: () => void; onLogout?: () => void }> = ({ onAdminClick, onLogout }) => {
   return (
@@ -10,7 +10,7 @@ const MainLayout: React.FC<{ onAdminClick?: () => void; onLogout?: () => void }>
       <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
+      <EditableFooter />
     </div>
   )
 }

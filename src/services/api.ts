@@ -12,7 +12,7 @@ console.log('🔗 API URL configured:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 8000,
+  timeout: 30000, // 30 seconds
 });
 
 // Add token to requests from sessionStorage

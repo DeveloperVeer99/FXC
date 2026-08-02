@@ -1,25 +1,25 @@
 import React from 'react'
-import Hero from '@/components/hero/Hero'
-import TradingEcosystem from '@/components/sections/TradingEcosystem'
-import Curriculum from '@/components/sections/Curriculum'
-import ProMentorship from '@/components/sections/ProMentorship'
-import TradingCommunity from '@/components/sections/TradingCommunity'
-import Testimonials from '@/components/sections/Testimonials'
+import EditableHero from '@/components/sections/EditableHero'
+import EditableTradingEcosystem from '@/components/sections/EditableTradingEcosystem'
+import EditableCurriculum from '@/components/sections/EditableCurriculum'
+import EditableProMentorship from '@/components/sections/EditableProMentorship'
+import EditableTradingCommunity from '@/components/sections/EditableTradingCommunity'
+import EditableTestimonials from '@/components/sections/EditableTestimonials'
 import EditableBanner from '@/components/EditableBanner'
 import EditablePlansPricing from '@/components/sections/EditablePlansPricing'
 
 export default function Home(): React.JSX.Element {
   return (
     <>
-      <Hero />
+      <EditableHero />
       <section id="courses">
-        <TradingEcosystem />
-        <Curriculum />
-        <ProMentorship />
+        <EditableTradingEcosystem />
+        <EditableCurriculum />
+        <EditableProMentorship />
       </section>
       <section id="community">
-        <TradingCommunity />
-        <Testimonials />
+        <EditableTradingCommunity />
+        <EditableTestimonials />
       </section>
       <section id="plans">
         <EditablePlansPricing />

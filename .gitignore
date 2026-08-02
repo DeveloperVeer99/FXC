@@ -1,90 +1,74 @@
-# AI / Editor agent data
-.qodo/
-.amazonq/
-
 # Dependencies
 node_modules/
-*.pnp
-.pnp.js
-
-# Production & Build
-dist/
-dist-ssr/
-build/
-*.local
-
-# Environment variables (NEVER commit these!)
-.env
-.env.local
-.env.*.local
-.env.production.local
-.env.development.local
-.env.example
-
-# Logs
-logs/
-*.log
+npm-debug.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
-# IDE & Editor
+# Build
+dist/
+dist-ssr/
+*.local
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.test
+
+# IDE and Editor
 .vscode/
-!.vscode/extensions.json
-!.vscode/settings.json
+.vscode-test
 .idea/
-*.iml
-*.iws
-*.ipr
-*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
 *.sublime-project
-.vs/
+*.sublime-workspace
 
-# OS files
+# OS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db
-*.swp
-*.swo
-*~
-
-# IDE metadata
-.editorconfig
-.eslintcache
-.stylelintcache
-
-# Optional npm cache
-.npm
-
-# Turbo
-.turbo/
+desktop.ini
 
 # Testing
 coverage/
 .nyc_output/
 
-# IDEs
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Vercel & Deployment
+# Vercel
+.vercel
 .vercel/
-.netlify/
 
-# macOS
-.AppleDouble
-.LSOverride
+# Logs
+logs/
+*.log
 
-# Credentials & Secrets (just in case)
-*.pem
-*.key
-secrets/
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+
+# Temp files
+tmp/
+temp/
+
+# Optional
+.turbo
+turbo.json
