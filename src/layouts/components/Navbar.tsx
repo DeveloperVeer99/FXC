@@ -35,15 +35,6 @@ export default function Navbar({ onAdminClick, onLogout }: NavbarProps) {
 
   return (
     <>
-      {/* Announcement Banner */}
-      <div className="flex items-center justify-center gap-3 bg-violet-700 px-4 py-2 text-center">
-        <span className="text-xs text-white/80 uppercase tracking-widest">Limited Seats Available</span>
-        <span className="rounded bg-white px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-violet-700">
-          Enroll Now
-        </span>
-        <span className="hidden sm:block text-xs text-white/70">Only a few spots left this batch</span>
-      </div>
-
       {/* Floating Navbar wrapper */}
       <div className="sticky top-0 z-50 flex justify-center px-4 pt-3 pb-1 sm:px-6">
         <header
