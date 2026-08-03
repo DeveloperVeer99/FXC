@@ -47,12 +47,13 @@ export default function Navbar({ onAdminClick, onLogout }: NavbarProps) {
           <nav className="flex h-14 items-center justify-between px-5 sm:px-6">
 
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-600 shadow-[0_0_12px_rgba(124,58,237,0.5)] group-hover:shadow-[0_0_18px_rgba(124,58,237,0.7)] transition-shadow">
-                <span className="text-[10px] font-black text-white tracking-tight">FXC</span>
-              </div>
-              <span className="text-sm font-semibold tracking-[0.12em] uppercase text-white">
-                FXC
+            <Link to="/" className="group relative flex items-center">
+              <span className="relative text-base font-black tracking-[0.18em] uppercase text-white transition-all duration-300 group-hover:tracking-[0.28em]">
+                <span className="bg-gradient-to-r from-white via-violet-200 to-white bg-clip-text text-transparent group-hover:from-violet-400 group-hover:via-white group-hover:to-violet-400 transition-all duration-500">
+                  FXC
+                </span>
+                <span className="text-violet-400 group-hover:text-white transition-colors duration-300">.IN</span>
+                <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-violet-500 to-transparent group-hover:w-full transition-all duration-500" />
               </span>
             </Link>
 

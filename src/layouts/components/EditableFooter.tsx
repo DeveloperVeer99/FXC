@@ -214,13 +214,13 @@ export default function EditableFooter() {
 
             {/* Brand column */}
             <div className="space-y-6">
-              <Link to="/" className="inline-flex items-center gap-3 group">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600 shadow-[0_0_20px_rgba(124,58,237,0.4)] group-hover:shadow-[0_0_28px_rgba(124,58,237,0.6)] transition-shadow">
-                  <span className="text-[11px] font-black text-white tracking-tight">FXC</span>
-                </div>
-                <span className="group/name text-base font-bold tracking-[0.15em] uppercase text-white">
-                  {data.companyName}
-                  <EditBtn onClick={() => setEditingField({ label: 'Company Name', field: 'companyName', value: data.companyName })} />
+              <Link to="/" className="group relative inline-flex items-center">
+                <span className="relative text-lg font-black tracking-[0.18em] uppercase transition-all duration-300 group-hover:tracking-[0.26em]">
+                  <span className="bg-gradient-to-r from-white via-violet-200 to-white bg-clip-text text-transparent group-hover:from-violet-400 group-hover:via-white group-hover:to-violet-400 transition-all duration-500">
+                    FXC
+                  </span>
+                  <span className="text-violet-400 group-hover:text-white transition-colors duration-300">.IN</span>
+                  <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-violet-500 to-transparent group-hover:w-full transition-all duration-500" />
                 </span>
               </Link>
 
