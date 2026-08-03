@@ -84,6 +84,20 @@ export const coursesAPI = {
   delete: (id: string) => api.delete(`/courses/${id}`),
 };
 
+export const paymentAPI = {
+  createOrder: (data: { amount: number; courseId: string; courseName: string }) =>
+    api.post('/payment/create-order', data),
+  verify: (data: {
+    razorpay_order_id: string
+    razorpay_payment_id: string
+    razorpay_signature: string
+    name: string
+    email: string
+    phone: string
+    courseName: string
+  }) => api.post('/payment/verify', data),
+};
+
 export const curriculumAPI = {
   get: () => api.get('/curriculum'),
   update: (data: any) => api.put('/curriculum', data),

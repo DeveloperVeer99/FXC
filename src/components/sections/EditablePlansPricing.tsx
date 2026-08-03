@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect, type MouseEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Check, ArrowUpRight, Plus, Trash2, Edit2, Save } from 'lucide-react'
+import { Check, ArrowUpRight, Plus, Trash2, Edit2, Save, X } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
-import { coursesAPI } from '../../services/api'
+import { coursesAPI, paymentAPI } from '../../services/api'
 
 interface Course {
   _id: string
@@ -71,6 +71,107 @@ function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>;
   )
 }
 
+function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
+  const inp = 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white text-sm focus:outline-none focus:border-violet-500'
+
+  const handlePay = async () => {
+    if (!form.name.trim()) { setError('Name is required'); return }
+    if (!form.email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(form.email)) { setError('Valid email is required'); return }
+    if (!form.phone.trim() || !/^[6-9]\d{9}$/.test(form.phone)) { setError('Valid 10-digit mobile number is required'); return }
+    setError('')
+    setLoading(true)
+    try {
+      const { data } = await paymentAPI.createOrder({ amount: course.price, courseId: course._id, courseName: course.title })
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'FourXClub',
+        description: course.title,
+        order_id: data.orderId,
+        prefill: { name: form.name, email: form.email, contact: form.phone },
+        theme: { color: '#7c3aed' },
+        handler: async (response: any) => {
+          try {
+            await paymentAPI.verify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              name: form.name,
+              email: form.email,
+              phone: form.phone,
+              courseName: course.title,
+            })
+            setSuccess(true)
+          } catch {
+            setError('Payment received but verification failed. Please contact support.')
+          }
+          setLoading(false)
+        },
+        modal: { ondismiss: () => setLoading(false) },
+      }
+      const rzp = new (window as any).Razorpay(options)
+      rzp.on('payment.failed', () => {
+        setError('Payment failed. Please try again.')
+        setLoading(false)
+      })
+      rzp.open()
+    } catch {
+      setError('Could not initiate payment. Please try again.')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-zinc-900 border border-violet-500/30 rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="text-white font-bold text-lg">{course.title}</h3>
+            <p className="text-violet-400 font-semibold text-sm mt-0.5">₹{course.price} — one-time payment</p>
+          </div>
+          <button onClick={onClose} className="text-zinc-500 hover:text-white transition"><X size={18} /></button>
+        </div>
+
+        {success ? (
+          <div className="text-center py-6">
+            <div className="w-14 h-14 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center mx-auto mb-4">
+              <Check className="text-violet-400" size={28} strokeWidth={2.5} />
+            </div>
+            <h4 className="text-white font-bold text-lg mb-2">Payment Successful!</h4>
+            <p className="text-zinc-400 text-sm mb-4">Check your email <span className="text-white font-medium">{form.email}</span> for next steps to get your course access.</p>
+            <button onClick={onClose} className="w-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold py-2.5 rounded-lg transition">Done</button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-zinc-400 mb-1 block">Full Name</label>
+              <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inp} placeholder="Your full name" />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-400 mb-1 block">Email</label>
+              <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inp} placeholder="your@email.com" />
+            </div>
+            <div>
+              <label className="text-xs text-zinc-400 mb-1 block">Mobile Number</label>
+              <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inp} placeholder="10-digit mobile number" maxLength={10} />
+            </div>
+            {error && <p className="text-red-400 text-xs px-1">{error}</p>}
+            <button onClick={handlePay} disabled={loading} className="w-full mt-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 text-white text-sm font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
+              {loading ? <><span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> Processing...</> : <>Pay ₹{course.price} <ArrowUpRight size={15} /></>}
+            </button>
+            <p className="text-xs text-zinc-500 text-center">Secured by Razorpay</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function HighlightEditModal({ value, onSave, onClose }: { value: string; onSave: (v: string) => void; onClose: () => void }) {
   const [val, setVal] = useState(value)
   return (
@@ -87,12 +188,13 @@ function HighlightEditModal({ value, onSave, onClose }: { value: string; onSave:
   )
 }
 
-function SpotlightCard({ course, isAdminMode, onEdit, onDelete, onEditHighlight, onDeleteHighlight, onAddHighlight }: {
+function SpotlightCard({ course, isAdminMode, onEdit, onDelete, onEditHighlight, onDeleteHighlight, onAddHighlight, onBuy }: {
   course: Course; isAdminMode: boolean
   onEdit: () => void; onDelete: () => void
   onEditHighlight: (idx: number, val: string) => void
   onDeleteHighlight: (idx: number) => void
   onAddHighlight: () => void
+  onBuy: () => void
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState({ x: 0, y: 0 })
@@ -148,7 +250,7 @@ function SpotlightCard({ course, isAdminMode, onEdit, onDelete, onEditHighlight,
             )}
           </ul>
         )}
-        <button className={`mt-10 inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition ${course.accent ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-[0_0_30px_rgba(124,58,237,0.3)]' : 'border border-white/15 bg-white/5 text-white hover:bg-white/10'}`}>
+        <button onClick={onBuy} className={`mt-10 inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition ${course.accent ? 'bg-violet-600 text-white hover:bg-violet-500 shadow-[0_0_30px_rgba(124,58,237,0.3)]' : 'border border-white/15 bg-white/5 text-white hover:bg-white/10'}`}>
           {course.cta} <ArrowUpRight size={15} />
         </button>
       </div>
@@ -161,6 +263,7 @@ export default function EditablePlansPricing() {
   const [loading, setLoading] = useState(true)
   const [editingCourse, setEditingCourse] = useState<Partial<Course> | null>(null)
   const [editingHighlight, setEditingHighlight] = useState<{ courseId: string; idx: number; value: string } | null>(null)
+  const [buyingCourse, setBuyingCourse] = useState<Course | null>(null)
   const { isAdminMode, dataSaved, sectionSaved, triggerDataRefresh } = useAdmin()
 
   useEffect(() => {
@@ -235,6 +338,7 @@ export default function EditablePlansPricing() {
                     onEditHighlight={(idx, val) => setEditingHighlight({ courseId: course._id, idx, value: val })}
                     onDeleteHighlight={idx => handleDeleteHighlight(course._id, idx)}
                     onAddHighlight={() => handleAddHighlight(course._id)}
+                    onBuy={() => !isAdminMode && setBuyingCourse(course)}
                   />
                 ))}
               </div>
@@ -243,6 +347,7 @@ export default function EditablePlansPricing() {
       </section>
       {editingCourse && <CourseEditModal course={editingCourse} onSave={handleSaveCourse} onClose={() => setEditingCourse(null)} />}
       {editingHighlight && <HighlightEditModal value={editingHighlight.value} onSave={handleSaveHighlight} onClose={() => setEditingHighlight(null)} />}
+      {buyingCourse && <BuyModal course={buyingCourse} onClose={() => setBuyingCourse(null)} />}
     </>
   )
 }
