@@ -98,6 +98,7 @@ function StatCard({ value, suffix, label, sub, inView }: { value: number; suffix
 
 export default function EditableStatsSection() {
   const [statsData, setStatsData] = useState<StatsData>(defaultStatsData)
+  const { dataSaved } = useAdmin()
 
   useEffect(() => {
     const fetchStatsData = async () => {
@@ -110,7 +111,7 @@ export default function EditableStatsSection() {
       }
     }
     fetchStatsData()
-  }, [])
+  }, [dataSaved])
 
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })

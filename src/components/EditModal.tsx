@@ -60,8 +60,8 @@ export const EditModal: React.FC<EditModalProps> = ({
       console.log('✅ Saved successfully!');
       setEditingItem(null);
       onClose();
-      // Reload to get fresh data from database
-      setTimeout(() => window.location.reload(), 300);
+      // Trigger global data refresh for all components
+      window.location.reload();
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || error.message || 'Failed to save';
       console.error('❌ Save error:', errorMsg, error);

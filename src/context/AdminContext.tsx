@@ -11,6 +11,8 @@ interface AdminContextType {
   editingItem: EditableItem | null;
   setEditingItem: (item: EditableItem | null) => void;
   isEditing: boolean;
+  dataSaved: number; // Timestamp when data was last saved
+  triggerDataRefresh: () => void;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -19,6 +21,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [editingItem, setEditingItem] = useState<EditableItem | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [dataSaved, setDataSaved] = useState(0);
 
   useEffect(() => {
     setIsEditing(editingItem !== null);
@@ -31,6 +34,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [isAdminMode]);
 
+  const triggerDataRefresh = () => {
+    setDataSaved(Date.now());
+  };
+
   return (
     <AdminContext.Provider
       value={{
@@ -39,6 +46,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         editingItem,
         setEditingItem,
         isEditing,
+        dataSaved,
+        triggerDataRefresh,
       }}
     >
       {children}
