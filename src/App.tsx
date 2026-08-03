@@ -4,6 +4,8 @@ import MainLayout from "@/layouts/MainLayout";
 import Home from "@/pages/Home";
 import NotFound from "@/pages/NotFound";
 import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import Refund from "@/pages/Refund";
 import { AdminLogin } from "@/components/AdminLogin";
 import { AdminProvider } from "@/context/AdminContext";
 import { EditModal } from "@/components/EditModal";
@@ -58,6 +60,8 @@ const AppContent: React.FC<{
         >
           <Route index element={<Home />} />
           <Route path="terms" element={<Terms />} />
+          <Route path="privacy" element={<Privacy />} />
+          <Route path="refund" element={<Refund />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

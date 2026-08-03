@@ -192,8 +192,8 @@ export default function EditableFooter() {
     if (!isAdminMode) return null
     return (
       <button type="button" onClick={onClick}
-        className="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-semibold rounded opacity-0 group-hover:opacity-100 transition-all align-middle">
-        <Edit2 size={9} />
+        className="inline-flex items-center gap-1 ml-1.5 px-1.5 py-0.5 bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-semibold rounded transition-all align-middle">
+        <Edit2 size={9} /> Edit
       </button>
     )
   }
