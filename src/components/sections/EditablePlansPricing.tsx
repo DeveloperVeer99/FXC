@@ -71,11 +71,31 @@ function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>;
   )
 }
 
+const TERMS = [
+  { title: '1. Definitions', body: "'FXC', 'Services', 'Platform', 'Courses', 'Mentorship', 'Trading Floor', 'PRIMO', 'User', and 'Content' refer to the products and services operated by FXC." },
+  { title: '2. Acceptance', body: 'By purchasing or using any FXC service you agree to these Terms. If you disagree, do not use the Services.' },
+  { title: '3. Eligibility', body: 'Users must be at least 18 years old or have guardian consent.' },
+  { title: '4. Educational Services', body: 'FXC provides educational content only. Nothing is investment advice, research advice, portfolio management, or a recommendation to buy or sell any security, derivative, forex pair or commodity.' },
+  { title: '5. Risk Disclosure', body: 'Trading involves substantial risk, including total loss of capital. Past performance does not guarantee future results.' },
+  { title: '6. Accounts', body: 'Accounts are personal, non-transferable and may not be shared.' },
+  { title: '7. Intellectual Property', body: 'All videos, PDFs, live sessions, GEX levels, Discord posts, graphics, logos and educational material are protected by copyright and other IP laws. Recording, redistribution, resale or commercial use without written permission is prohibited.' },
+  { title: '8. Lifetime Access', body: 'Lifetime access means for the commercial lifetime of the specific product on the FXC platform and is subject to maintenance, updates and discontinuation.' },
+  { title: '9. Subscriptions', body: 'Subscription plans renew until cancelled. Cancellation prevents future renewals only.' },
+  { title: '10. Conduct', body: 'No abuse, harassment, spam, piracy, cheating, impersonation or unlawful conduct.' },
+  { title: '11. Suspension', body: 'FXC may suspend access for piracy, chargeback abuse, account sharing or serious misconduct.' },
+  { title: '12. Third Parties', body: 'FXC is not responsible for brokers, exchanges, Discord, Shopify, payment gateways or data providers.' },
+  { title: '13. Limitation of Liability', body: 'To the maximum extent permitted by law, FXC is not liable for trading losses, lost profits, indirect or consequential damages, downtime or third-party failures.' },
+  { title: '14. Indemnity', body: 'Users agree to indemnify FXC against claims arising from misuse of the Services or breach of these Terms.' },
+  { title: '15. Force Majeure', body: 'FXC is not liable for delays caused by events beyond reasonable control.' },
+  { title: '16. Governing Law', body: 'Governed by the laws of India. Subject to mandatory consumer rights, disputes shall be subject to courts in Delhi.' },
+]
+
 function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) {
+  const [step, setStep] = useState<'terms' | 'details' | 'success'>('terms')
+  const [accepted, setAccepted] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', phone: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
   const inp = 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white text-sm focus:outline-none focus:border-violet-500'
 
   const handlePay = async () => {
@@ -106,7 +126,7 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
               phone: form.phone,
               courseName: course.title,
             })
-            setSuccess(true)
+            setStep('success')
           } catch {
             setError('Payment received but verification failed. Please contact support.')
           }
@@ -115,10 +135,7 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
         modal: { ondismiss: () => setLoading(false) },
       }
       const rzp = new (window as any).Razorpay(options)
-      rzp.on('payment.failed', () => {
-        setError('Payment failed. Please try again.')
-        setLoading(false)
-      })
+      rzp.on('payment.failed', () => { setError('Payment failed. Please try again.'); setLoading(false) })
       rzp.open()
     } catch {
       setError('Could not initiate payment. Please try again.')
@@ -128,8 +145,10 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-zinc-900 border border-violet-500/30 rounded-xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
+      <div className="bg-zinc-900 border border-violet-500/30 rounded-xl w-full max-w-md max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-white/8 shrink-0">
           <div>
             <h3 className="text-white font-bold text-lg">{course.title}</h3>
             <p className="text-violet-400 font-semibold text-sm mt-0.5">₹{course.price} — one-time payment</p>
@@ -137,17 +156,50 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
           <button onClick={onClose} className="text-zinc-500 hover:text-white transition"><X size={18} /></button>
         </div>
 
-        {success ? (
-          <div className="text-center py-6">
-            <div className="w-14 h-14 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center mx-auto mb-4">
-              <Check className="text-violet-400" size={28} strokeWidth={2.5} />
-            </div>
-            <h4 className="text-white font-bold text-lg mb-2">Payment Successful!</h4>
-            <p className="text-zinc-400 text-sm mb-4">Check your email <span className="text-white font-medium">{form.email}</span> for next steps to get your course access.</p>
-            <button onClick={onClose} className="w-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold py-2.5 rounded-lg transition">Done</button>
+        {/* Step indicators */}
+        {step !== 'success' && (
+          <div className="flex items-center gap-2 px-6 py-3 shrink-0">
+            {(['terms', 'details'] as const).map((s, i) => (
+              <div key={s} className="flex items-center gap-2">
+                <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  step === s ? 'bg-violet-600 text-white' : step === 'details' && s === 'terms' ? 'bg-violet-600/40 text-violet-300' : 'bg-zinc-800 text-zinc-500'
+                }`}>{i + 1}</div>
+                <span className={`text-xs font-medium ${ step === s ? 'text-white' : 'text-zinc-500'}`}>
+                  {s === 'terms' ? 'Terms' : 'Details'}
+                </span>
+                {i === 0 && <div className="w-6 h-px bg-zinc-700 mx-1" />}
+              </div>
+            ))}
           </div>
-        ) : (
-          <div className="space-y-3">
+        )}
+
+        {/* Step 1 — Terms */}
+        {step === 'terms' && (
+          <>
+            <div className="overflow-y-auto px-6 py-2 flex-1 space-y-4">
+              {TERMS.map(t => (
+                <div key={t.title} className="border-l-2 border-violet-500/30 pl-3">
+                  <p className="text-xs font-semibold text-white mb-1">{t.title}</p>
+                  <p className="text-xs text-zinc-400 leading-5">{t.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="px-6 py-4 border-t border-white/8 shrink-0 space-y-3">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} className="mt-0.5 w-4 h-4 accent-violet-600 shrink-0" />
+                <span className="text-xs text-zinc-400 leading-5">I have read and agree to the Terms & Conditions</span>
+              </label>
+              <button onClick={() => accepted && setStep('details')} disabled={!accepted}
+                className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-semibold py-2.5 rounded-lg transition">
+                Continue
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Step 2 — Details */}
+        {step === 'details' && (
+          <div className="px-6 py-5 space-y-3 flex-1">
             <div>
               <label className="text-xs text-zinc-400 mb-1 block">Full Name</label>
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inp} placeholder="Your full name" />
@@ -161,12 +213,25 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
               <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inp} placeholder="10-digit mobile number" maxLength={10} />
             </div>
             {error && <p className="text-red-400 text-xs px-1">{error}</p>}
-            <button onClick={handlePay} disabled={loading} className="w-full mt-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 text-white text-sm font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
+            <button onClick={handlePay} disabled={loading} className="w-full mt-1 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 text-white text-sm font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2">
               {loading ? <><span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> Processing...</> : <>Pay ₹{course.price} <ArrowUpRight size={15} /></>}
             </button>
             <p className="text-xs text-zinc-500 text-center">Secured by Razorpay</p>
           </div>
         )}
+
+        {/* Step 3 — Success */}
+        {step === 'success' && (
+          <div className="text-center px-6 py-10">
+            <div className="w-14 h-14 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center mx-auto mb-4">
+              <Check className="text-violet-400" size={28} strokeWidth={2.5} />
+            </div>
+            <h4 className="text-white font-bold text-lg mb-2">Payment Successful!</h4>
+            <p className="text-zinc-400 text-sm mb-6">Check your email <span className="text-white font-medium">{form.email}</span> for next steps to get your course access.</p>
+            <button onClick={onClose} className="w-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold py-2.5 rounded-lg transition">Done</button>
+          </div>
+        )}
+
       </div>
     </div>
   )
