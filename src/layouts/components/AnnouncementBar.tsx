@@ -89,14 +89,22 @@ export default function AnnouncementBar() {
   // In admin mode always show so it can be edited; otherwise respect isActive
   if (!data.isActive && !isAdminMode) return null
 
+  const scrollToCourses = () => {
+    document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   // Build the repeating ticker content
   const tickerItems = Array.from({ length: 8 }, (_, i) => (
     <span key={i} className="inline-flex items-center gap-3 px-6">
       <span className="h-1 w-1 rounded-full bg-white/40" />
       <span className="font-semibold tracking-wide">{data.text}</span>
-      <span className="rounded bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-700">
+      <button
+        type="button"
+        onClick={scrollToCourses}
+        className="rounded bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-700 hover:bg-violet-100 transition-colors cursor-pointer"
+      >
         {data.ctaText}
-      </span>
+      </button>
       <span className="text-white/60 text-xs hidden sm:inline">{data.message}</span>
     </span>
   ))
