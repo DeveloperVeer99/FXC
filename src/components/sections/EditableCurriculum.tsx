@@ -148,8 +148,6 @@ export default function EditableCurriculum() {
   }
 
   const modules = curriculumData.modules || []
-  const totalLessons = modules.reduce((a, m) => { const n = parseInt(m.duration); return a + (isNaN(n) ? 0 : n) }, 0)
-
   if (loading) return (
     <section className="bg-black px-4 py-24 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-4xl text-center text-zinc-400">Loading curriculum...</div>

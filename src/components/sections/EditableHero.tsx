@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
-import { ArrowUpRight, ArrowRight, BarChart2, Layers, TrendingUp, Zap, Edit2 } from 'lucide-react'
+import { ArrowRight, BarChart2, Layers, TrendingUp, Zap, Edit2 } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
 import HeroBackground from '../hero/HeroBackground'
 import ScrollIndicator from '../hero/ScrollIndicator'
@@ -161,7 +161,7 @@ export default function EditableHero(): React.JSX.Element {
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Live Trading Floor Active</span>
             </motion.div>
 
-            <h1 className="max-w-4xl text-5xl font-bold leading-[1.06] tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl text-4xl font-bold leading-[1.06] tracking-tight sm:text-6xl lg:text-7xl">
               <span className="group block">
                 {heroData.headline}
                 <EditBtn field="headline" value={heroData.headline} />

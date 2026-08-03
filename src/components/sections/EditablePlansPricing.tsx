@@ -144,8 +144,8 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-zinc-900 border border-violet-500/30 rounded-xl w-full max-w-md max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={onClose}>
+      <div className="bg-zinc-900 border border-violet-500/30 rounded-t-2xl sm:rounded-xl w-full sm:max-w-md max-h-[92vh] flex flex-col" onClick={e => e.stopPropagation()}>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-white/8 shrink-0">
@@ -383,7 +383,7 @@ export default function EditablePlansPricing() {
             <div className="inline-flex items-center gap-2 rounded-md border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 mb-6">
               <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">Choose Your Path</span>
             </div>
-            <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Plans & Pricing</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">Plans & Pricing</h2>
             <p className="mt-4 text-base text-zinc-400">Pick the plan that matches your trading goals.</p>
             {isAdminMode && (
               <button onClick={() => setEditingCourse({ title: '', price: 0, description: '', cta: 'Get Started', label: '', highlights: [], accent: false, isActive: true })}
@@ -395,7 +395,7 @@ export default function EditablePlansPricing() {
           {loading ? <div className="text-center text-zinc-400">Loading courses...</div>
             : courses.length === 0 ? <div className="text-center text-zinc-400">No courses available</div>
             : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {courses.map(course => (
                   <SpotlightCard key={course._id} course={course} isAdminMode={isAdminMode}
                     onEdit={() => setEditingCourse(course)}

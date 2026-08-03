@@ -100,7 +100,7 @@ export default function EditableProMentorship() {
           <div className="grid gap-4 lg:grid-cols-12">
 
             {/* Left */}
-            <div className="lg:col-span-7 rounded-xl border border-white/8 bg-[#0d0d0d] p-8 flex flex-col justify-between">
+            <div className="lg:col-span-7 rounded-xl border border-white/8 bg-[#0d0d0d] p-6 sm:p-8 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-8 pb-6 border-b border-white/8">
                   <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">FXC // ORDERFLOW & OPTIONFLOW</span>
@@ -114,7 +114,7 @@ export default function EditableProMentorship() {
                 </p>
               </div>
 
-              <div className="mt-10 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="mt-10 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">Total Access</div>
                   <div className="text-3xl font-bold text-white mt-1">{mentorshipData.price}</div>
@@ -129,7 +129,7 @@ export default function EditableProMentorship() {
             </div>
 
             {/* Right */}
-            <div className="lg:col-span-5 rounded-xl border border-white/8 bg-[#0d0d0d] p-8 flex flex-col justify-between">
+            <div className="lg:col-span-5 rounded-xl border border-white/8 bg-[#0d0d0d] p-6 sm:p-8 flex flex-col justify-between">
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-6">What You Will Get</h4>
                 <ul className="space-y-4">
@@ -149,7 +149,7 @@ export default function EditableProMentorship() {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 grid-cols-1 sm:grid-cols-3">
             {features.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="rounded-xl border border-white/8 bg-[#0d0d0d] p-6">
                 <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10">

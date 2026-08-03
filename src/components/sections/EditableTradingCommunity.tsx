@@ -126,7 +126,7 @@ export default function EditableTradingCommunity() {
           </div>
 
           {/* Full-width card */}
-          <div className="rounded-xl border border-white/8 bg-[#0d0d0d] p-8 md:p-12">
+          <div className="rounded-xl border border-white/8 bg-[#0d0d0d] p-6 sm:p-8 md:p-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
               {/* Left — info */}
