@@ -165,7 +165,7 @@ export default function EditableCurriculum() {
               <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">What You Learn</span>
             </div>
             <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">Course Curriculum</h2>
-            <p className="mt-4 text-base text-zinc-400">{modules.length} modules &middot; {totalLessons} lessons</p>
+            <p className="mt-4 text-base text-zinc-400">{modules.length} modules</p>
           </motion.div>
 
           <div className="space-y-2">

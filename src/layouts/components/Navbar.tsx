@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Menu, X, ArrowUpRight, LogOut } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAdmin } from '../../context/AdminContext'
 
 const navLinks = [
@@ -18,6 +18,8 @@ export default function Navbar({ onAdminClick, onLogout }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { isAdminMode } = useAdmin()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -26,10 +28,12 @@ export default function Navbar({ onAdminClick, onLogout }: NavbarProps) {
   }, [])
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      setMobileOpen(false)
+    setMobileOpen(false)
+    if (location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 300)
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
     }
   }
 

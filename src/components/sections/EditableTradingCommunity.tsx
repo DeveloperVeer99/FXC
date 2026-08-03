@@ -199,10 +199,9 @@ export default function EditableTradingCommunity() {
                   )}
                 </div>
 
-                <div className="w-full grid grid-cols-3 gap-3">
+                <div className="w-full grid grid-cols-2 gap-3">
                   {[
                     { v: 'Free', l: 'First Month' },
-                    { v: '24/7', l: 'Active Floor' },
                     { v: '0', l: 'Signals / Spam' },
                   ].map(item => (
                     <div key={item.v} className="rounded-lg border border-white/8 bg-black p-4 text-center">

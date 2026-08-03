@@ -196,13 +196,10 @@ export default function EditableHero(): React.JSX.Element {
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
-              <a href="https://discord.gg/vrHwGxE3VA" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(124,58,237,0.5)] transition hover:bg-violet-500">
-                Get Access <ArrowUpRight size={16} />
-              </a>
               <button
                 type="button"
                 onClick={() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(124,58,237,0.5)] transition hover:bg-violet-500"
               >
                 Explore Course <ArrowRight size={16} />
               </button>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Edit2, Save, X, Plus, Trash2, ExternalLink } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
 import api from '../../services/api'
@@ -149,6 +149,17 @@ export default function EditableFooter() {
   const [editingField, setEditingField] = useState<{ label: string; field: keyof Omit<FooterData, 'socials'>; value: string; multiline?: boolean } | null>(null)
   const [editingSocial, setEditingSocial] = useState<{ index: number; social: Social } | null>(null)
   const { isAdminMode, sectionSaved, triggerDataRefresh } = useAdmin()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const scrollToSection = (id: string) => {
+    if (location.pathname !== '/') {
+      navigate('/')
+      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 300)
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   useEffect(() => {
     api.get('/footer').then(r => {
@@ -267,7 +278,7 @@ export default function EditableFooter() {
                   <li key={id}>
                     <button
                       type="button"
-                      onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() => scrollToSection(id)}
                       className="text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer bg-none border-none text-left"
                     >
                       {label}
