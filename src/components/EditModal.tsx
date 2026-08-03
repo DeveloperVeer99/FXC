@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAdmin } from '../context/AdminContext';
-import { bannerAPI, coursesAPI, footerAPI } from '../services/api';
+import { bannerAPI, coursesAPI, footerAPI, curriculumAPI } from '../services/api';
 import api from '../services/api';
 
 interface EditModalProps {
@@ -12,27 +12,21 @@ interface EditModalProps {
   itemData: any;
 }
 
-export const EditModal: React.FC<EditModalProps> = ({
-  isOpen,
-  onClose,
-  itemType,
-  itemData,
-}) => {
+export const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, itemType, itemData }) => {
   const [formData, setFormData] = useState<any>({});
   const [loading, setLoading] = useState(false);
-  const { setEditingItem } = useAdmin();
+  const [error, setError] = useState<string | null>(null);
+  const { setEditingItem, triggerDataRefresh } = useAdmin();
 
   useEffect(() => {
-    if (itemData) {
-      setFormData(itemData);
-    }
+    if (itemData) setFormData(itemData);
+    setError(null);
   }, [itemData, isOpen]);
 
   const handleSave = async () => {
     setLoading(true);
+    setError(null);
     try {
-      console.log('💾 Saving', itemType, 'data...');
-      
       if (itemType === 'banner') {
         await bannerAPI.update(formData);
       } else if (itemType === 'course') {
@@ -41,6 +35,8 @@ export const EditModal: React.FC<EditModalProps> = ({
         } else {
           await coursesAPI.create(formData);
         }
+      } else if (itemType === 'curriculum') {
+        await curriculumAPI.update({ modules: formData.modules });
       } else if (itemType === 'hero') {
         await api.put('/hero', formData);
       } else if (itemType === 'stats') {
@@ -56,27 +52,24 @@ export const EditModal: React.FC<EditModalProps> = ({
       } else if (itemType === 'footer') {
         await footerAPI.update(formData);
       }
-      
-      console.log('✅ Saved successfully!');
+
       setEditingItem(null);
+      triggerDataRefresh(itemType as any);
       onClose();
-      // Trigger global data refresh for all components
-      window.location.reload();
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || error.message || 'Failed to save';
-      console.error('❌ Save error:', errorMsg, error);
-      alert('Failed to save. Error: ' + errorMsg);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Failed to save';
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
+    setFormData({ ...formData, [field]: value });
   };
+
+  const inputClass = 'w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500';
+  const labelClass = 'block text-sm font-medium text-zinc-400 mb-2';
 
   const renderFormFields = () => {
     switch (itemType) {
@@ -84,26 +77,12 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Title Text
-              </label>
-              <input
-                type="text"
-                value={formData.text || ''}
-                onChange={(e) => handleChange('text', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Title Text</label>
+              <input type="text" value={formData.text || ''} onChange={(e) => handleChange('text', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Message
-              </label>
-              <textarea
-                value={formData.message || ''}
-                onChange={(e) => handleChange('message', e.target.value)}
-                rows={3}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Message</label>
+              <textarea value={formData.message || ''} onChange={(e) => handleChange('message', e.target.value)} rows={3} className={inputClass} />
             </div>
           </div>
         );
@@ -112,88 +91,93 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Title
-              </label>
-              <input
-                type="text"
-                value={formData.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Title</label>
+              <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Description
-              </label>
-              <textarea
-                value={formData.description || ''}
-                onChange={(e) => handleChange('description', e.target.value)}
-                rows={2}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Description</label>
+              <textarea value={formData.description || ''} onChange={(e) => handleChange('description', e.target.value)} rows={2} className={inputClass} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  value={formData.price || 0}
-                  onChange={(e) => handleChange('price', parseFloat(e.target.value))}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                />
+                <label className={labelClass}>Price</label>
+                <input type="number" value={formData.price || 0} onChange={(e) => handleChange('price', parseFloat(e.target.value))} className={inputClass} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">
-                  Label
-                </label>
-                <input
-                  type="text"
-                  value={formData.label || ''}
-                  onChange={(e) => handleChange('label', e.target.value)}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                  placeholder="e.g., Popular"
-                />
+                <label className={labelClass}>Label</label>
+                <input type="text" value={formData.label || ''} onChange={(e) => handleChange('label', e.target.value)} className={inputClass} placeholder="e.g., Popular" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                CTA Button Text
-              </label>
-              <input
-                type="text"
-                value={formData.cta || ''}
-                onChange={(e) => handleChange('cta', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-                placeholder="e.g., Get Started"
-              />
+              <label className={labelClass}>CTA Button Text</label>
+              <input type="text" value={formData.cta || ''} onChange={(e) => handleChange('cta', e.target.value)} className={inputClass} placeholder="e.g., Get Started" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Highlights (one per line)
-              </label>
+              <label className={labelClass}>Highlights (one per line)</label>
               <textarea
                 value={(formData.highlights || []).join('\n')}
-                onChange={(e) => handleChange('highlights', e.target.value.split('\n').filter(h => h.trim()))}
+                onChange={(e) => handleChange('highlights', e.target.value.split('\n').filter((h: string) => h.trim()))}
                 rows={4}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500 font-mono text-xs"
+                className={`${inputClass} font-mono text-xs`}
                 placeholder="Enter each highlight on a new line"
               />
             </div>
             <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.accent || false}
-                onChange={(e) => handleChange('accent', e.target.checked)}
-                id="accent"
-                className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-violet-600 cursor-pointer"
-              />
-              <label htmlFor="accent" className="text-sm font-medium text-zinc-400 cursor-pointer">
-                Mark as Featured Course
-              </label>
+              <input type="checkbox" checked={formData.accent || false} onChange={(e) => handleChange('accent', e.target.checked)} id="accent" className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-violet-600 cursor-pointer" />
+              <label htmlFor="accent" className="text-sm font-medium text-zinc-400 cursor-pointer">Mark as Featured Course</label>
             </div>
+          </div>
+        );
+
+      case 'curriculum':
+        return (
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            <p className="text-xs text-zinc-500">Edit module titles and topics. Each topic on a new line.</p>
+            {(formData.modules || []).map((mod: any, i: number) => (
+              <div key={i} className="border border-zinc-700 rounded-md p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-violet-400 shrink-0">{mod.number}</span>
+                  <input
+                    type="text"
+                    value={mod.title || ''}
+                    onChange={(e) => {
+                      const updated = [...formData.modules];
+                      updated[i] = { ...updated[i], title: e.target.value };
+                      handleChange('modules', updated);
+                    }}
+                    className={inputClass}
+                    placeholder="Module title"
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Duration</label>
+                  <input
+                    type="text"
+                    value={mod.duration || ''}
+                    onChange={(e) => {
+                      const updated = [...formData.modules];
+                      updated[i] = { ...updated[i], duration: e.target.value };
+                      handleChange('modules', updated);
+                    }}
+                    className={inputClass}
+                    placeholder="e.g., 7 lessons"
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Topics (one per line)</label>
+                  <textarea
+                    value={(mod.topics || []).join('\n')}
+                    onChange={(e) => {
+                      const updated = [...formData.modules];
+                      updated[i] = { ...updated[i], topics: e.target.value.split('\n').filter((t: string) => t.trim()) };
+                      handleChange('modules', updated);
+                    }}
+                    rows={4}
+                    className={`${inputClass} font-mono text-xs`}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         );
 
@@ -201,37 +185,16 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Main Headline
-              </label>
-              <textarea
-                value={formData.headline || ''}
-                onChange={(e) => handleChange('headline', e.target.value)}
-                rows={2}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Main Headline</label>
+              <textarea value={formData.headline || ''} onChange={(e) => handleChange('headline', e.target.value)} rows={2} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Highlighted Text
-              </label>
-              <input
-                type="text"
-                value={formData.highlightedText || ''}
-                onChange={(e) => handleChange('highlightedText', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Highlighted Text</label>
+              <input type="text" value={formData.highlightedText || ''} onChange={(e) => handleChange('highlightedText', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Subheadline
-              </label>
-              <textarea
-                value={formData.subheadline || ''}
-                onChange={(e) => handleChange('subheadline', e.target.value)}
-                rows={3}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Subheadline</label>
+              <textarea value={formData.subheadline || ''} onChange={(e) => handleChange('subheadline', e.target.value)} rows={3} className={inputClass} />
             </div>
           </div>
         );
@@ -240,65 +203,30 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Active Learners Value
-              </label>
-              <input
-                type="number"
-                value={formData.activeLearnersValue || 500}
-                onChange={(e) => handleChange('activeLearnersValue', parseInt(e.target.value))}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Active Learners Value</label>
+              <input type="number" value={formData.activeLearnersValue || 500} onChange={(e) => handleChange('activeLearnersValue', parseInt(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Completion Rate %
-              </label>
-              <input
-                type="number"
-                value={formData.completionRate || 98}
-                onChange={(e) => handleChange('completionRate', parseInt(e.target.value))}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Completion Rate %</label>
+              <input type="number" value={formData.completionRate || 98} onChange={(e) => handleChange('completionRate', parseInt(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Avg ROI Improvement
-              </label>
-              <input
-                type="number"
-                value={formData.avgROI || 14}
-                onChange={(e) => handleChange('avgROI', parseInt(e.target.value))}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Avg ROI Improvement</label>
+              <input type="number" value={formData.avgROI || 14} onChange={(e) => handleChange('avgROI', parseInt(e.target.value))} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Average Rating
-              </label>
-              <input
-                type="text"
-                value={formData.averageRating || '4.9'}
-                onChange={(e) => handleChange('averageRating', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Average Rating</label>
+              <input type="text" value={formData.averageRating || '4.9'} onChange={(e) => handleChange('averageRating', e.target.value)} className={inputClass} />
             </div>
           </div>
         );
 
       case 'testimonials':
         return (
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Testimonials Intro Text
-              </label>
-              <textarea
-                value={formData.introText || ''}
-                onChange={(e) => handleChange('introText', e.target.value)}
-                rows={2}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Testimonials Intro Text</label>
+              <textarea value={formData.introText || ''} onChange={(e) => handleChange('introText', e.target.value)} rows={2} className={inputClass} />
             </div>
           </div>
         );
@@ -307,76 +235,34 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Section Title
-              </label>
-              <input
-                type="text"
-                value={formData.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Section Title</label>
+              <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Description
-              </label>
-              <textarea
-                value={formData.description || ''}
-                onChange={(e) => handleChange('description', e.target.value)}
-                rows={2}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Description</label>
+              <textarea value={formData.description || ''} onChange={(e) => handleChange('description', e.target.value)} rows={2} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Discord Link
-              </label>
-              <input
-                type="text"
-                value={formData.discordLink || ''}
-                onChange={(e) => handleChange('discordLink', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Discord Link</label>
+              <input type="text" value={formData.discordLink || ''} onChange={(e) => handleChange('discordLink', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Referral Code
-              </label>
-              <input
-                type="text"
-                value={formData.referralCode || ''}
-                onChange={(e) => handleChange('referralCode', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Referral Code</label>
+              <input type="text" value={formData.referralCode || ''} onChange={(e) => handleChange('referralCode', e.target.value)} className={inputClass} />
             </div>
           </div>
         );
 
       case 'ecosystem':
         return (
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Section Title
-              </label>
-              <input
-                type="text"
-                value={formData.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Section Title</label>
+              <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Subtitle
-              </label>
-              <textarea
-                value={formData.subtitle || ''}
-                onChange={(e) => handleChange('subtitle', e.target.value)}
-                rows={2}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Subtitle</label>
+              <textarea value={formData.subtitle || ''} onChange={(e) => handleChange('subtitle', e.target.value)} rows={2} className={inputClass} />
             </div>
           </div>
         );
@@ -385,37 +271,16 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Section Title
-              </label>
-              <input
-                type="text"
-                value={formData.title || ''}
-                onChange={(e) => handleChange('title', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Section Title</label>
+              <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Price
-              </label>
-              <input
-                type="text"
-                value={formData.price || ''}
-                onChange={(e) => handleChange('price', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Price</label>
+              <input type="text" value={formData.price || ''} onChange={(e) => handleChange('price', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Description
-              </label>
-              <textarea
-                value={formData.description || ''}
-                onChange={(e) => handleChange('description', e.target.value)}
-                rows={3}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Description</label>
+              <textarea value={formData.description || ''} onChange={(e) => handleChange('description', e.target.value)} rows={3} className={inputClass} />
             </div>
           </div>
         );
@@ -424,59 +289,24 @@ export const EditModal: React.FC<EditModalProps> = ({
         return (
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Company Name
-              </label>
-              <input
-                type="text"
-                value={formData.companyName || ''}
-                onChange={(e) => handleChange('companyName', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Company Name</label>
+              <input type="text" value={formData.companyName || ''} onChange={(e) => handleChange('companyName', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.email || ''}
-                onChange={(e) => handleChange('email', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Email</label>
+              <input type="email" value={formData.email || ''} onChange={(e) => handleChange('email', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Phone
-              </label>
-              <input
-                type="tel"
-                value={formData.phone || ''}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Phone</label>
+              <input type="tel" value={formData.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Copyright Text
-              </label>
-              <input
-                type="text"
-                value={formData.copyrightText || ''}
-                onChange={(e) => handleChange('copyrightText', e.target.value)}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Copyright Text</label>
+              <input type="text" value={formData.copyrightText || ''} onChange={(e) => handleChange('copyrightText', e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">
-                Disclaimer Text
-              </label>
-              <textarea
-                value={formData.disclaimerText || ''}
-                onChange={(e) => handleChange('disclaimerText', e.target.value)}
-                rows={2}
-                className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:border-violet-500"
-              />
+              <label className={labelClass}>Disclaimer Text</label>
+              <textarea value={formData.disclaimerText || ''} onChange={(e) => handleChange('disclaimerText', e.target.value)} rows={2} className={inputClass} />
             </div>
           </div>
         );
@@ -507,16 +337,18 @@ export const EditModal: React.FC<EditModalProps> = ({
               <h3 className="text-lg font-bold text-white">
                 Edit {itemType?.charAt(0).toUpperCase()}{itemType?.slice(1)}
               </h3>
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-zinc-400 hover:text-white transition"
-              >
+              <button type="button" onClick={onClose} className="text-zinc-400 hover:text-white transition">
                 <X size={20} />
               </button>
             </div>
 
             {renderFormFields()}
+
+            {error && (
+              <div className="mt-4 p-3 bg-red-500/20 border border-red-500/40 rounded-md">
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+            )}
 
             <div className="mt-6 flex gap-3">
               <button

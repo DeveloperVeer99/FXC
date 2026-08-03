@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
-import { ArrowUpRight, ArrowRight, BarChart2, Layers, TrendingUp, Zap } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { ArrowUpRight, ArrowRight, BarChart2, Layers, TrendingUp, Zap, Edit2 } from 'lucide-react'
 import { useAdmin } from '../../context/AdminContext'
-import { EditableWrapper } from '../EditableWrapper'
 import HeroBackground from '../hero/HeroBackground'
 import ScrollIndicator from '../hero/ScrollIndicator'
 import api from '../../services/api'
@@ -13,11 +11,6 @@ const tags = [
   { icon: Layers, label: 'Auction Market Theory' },
   { icon: TrendingUp, label: 'Optionflow' },
   { icon: Zap, label: 'Live Trading Floor' },
-]
-
-const stats = [
-  { value: '500+', label: 'Active Learners' },
-  { value: '4.9★', label: 'Avg Rating' },
 ]
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%'
@@ -35,14 +28,12 @@ function useScramble(target: string, trigger: boolean) {
     let frame = 0
     const total = 18
     const interval = setInterval(() => {
-      setText(
-        target.split('').map((char, i) => {
-          if (char === ' ') return ' '
-          if (char === '.') return '.'
-          if (frame / total > i / target.length) return char
-          return CHARS[Math.floor(Math.random() * CHARS.length)]
-        }).join('')
-      )
+      setText(target.split('').map((char, i) => {
+        if (char === ' ') return ' '
+        if (char === '.') return '.'
+        if (frame / total > i / target.length) return char
+        return CHARS[Math.floor(Math.random() * CHARS.length)]
+      }).join(''))
       frame++
       if (frame > total) clearInterval(interval)
     }, 40)
@@ -51,24 +42,42 @@ function useScramble(target: string, trigger: boolean) {
   return text
 }
 
+// Inline edit modal for hero fields
+function HeroEditModal({ field, value, onSave, onClose }: { field: string; value: string; onSave: (v: string) => void; onClose: () => void }) {
+  const [val, setVal] = useState(value)
+  return (
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-zinc-900 border border-violet-500/30 rounded-lg p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
+        <h3 className="text-white font-bold mb-4 text-sm">Edit {field}</h3>
+        <textarea
+          value={val}
+          onChange={e => setVal(e.target.value)}
+          rows={3}
+          className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white text-sm focus:outline-none focus:border-violet-500"
+          autoFocus
+        />
+        <div className="flex gap-2 mt-4">
+          <button onClick={() => onSave(val)} className="flex-1 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold py-2 rounded transition">Save</button>
+          <button onClick={onClose} className="flex-1 border border-zinc-600 hover:bg-zinc-800 text-white text-sm font-semibold py-2 rounded transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function EditableHero(): React.JSX.Element {
   const [heroData, setHeroData] = useState<HeroData>({
     headline: 'Trade What The',
     highlightedText: 'Market Shows.',
     subheadline: 'FXC teaches institutional-grade orderflow, auction market theory, and optionflow — the same tools professional traders use to read real market structure and execute with edge.',
   })
+  const [editingField, setEditingField] = useState<{ field: keyof HeroData; value: string } | null>(null)
+
+  const { isAdminMode, dataSaved, sectionSaved, triggerDataRefresh } = useAdmin()
 
   useEffect(() => {
-    const fetchHeroData = async () => {
-      try {
-        const response = await api.get('/hero');
-        setHeroData(response.data);
-      } catch (error) {
-        console.error('Failed to fetch hero data:', error);
-      }
-    };
-    fetchHeroData();
-  }, []);
+    api.get('/hero').then(r => setHeroData(r.data)).catch(() => {})
+  }, [dataSaved, sectionSaved['hero']])
 
   const containerRef = useRef<HTMLElement>(null)
   const mouseX = useMotionValue(0)
@@ -77,7 +86,6 @@ export default function EditableHero(): React.JSX.Element {
   const springY = useSpring(mouseY, { stiffness: 60, damping: 20 })
   const [scramble, setScramble] = useState(false)
   const rafRef = useRef<number | null>(null)
-  const { setEditingItem } = useAdmin()
 
   useEffect(() => {
     const timer = setTimeout(() => setScramble(true), 800)
@@ -96,27 +104,41 @@ export default function EditableHero(): React.JSX.Element {
     })
   }
 
-  const handleEdit = (data: HeroData) => {
-    setEditingItem({
-      type: 'hero',
-      data,
-    })
+  const handleSaveField = async (value: string) => {
+    if (!editingField) return
+    try {
+      const updated = { ...heroData, [editingField.field]: value }
+      await api.put('/hero', updated)
+      setHeroData(updated)
+      triggerDataRefresh('hero')
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setEditingField(null)
+    }
+  }
+
+  const EditBtn = ({ field, value }: { field: keyof HeroData; value: string }) => {
+    if (!isAdminMode) return null
+    return (
+      <button
+        type="button"
+        onClick={() => setEditingField({ field, value })}
+        className="inline-flex items-center gap-1 ml-2 px-1.5 py-0.5 bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-semibold rounded opacity-0 group-hover:opacity-100 transition-all align-middle"
+      >
+        <Edit2 size={10} />
+      </button>
+    )
   }
 
   return (
-    <EditableWrapper
-      type="hero"
-      data={heroData}
-      onEdit={handleEdit}
-    >
+    <>
       <main
         ref={containerRef}
         onMouseMove={handleMouseMove}
         className="relative min-h-screen overflow-hidden bg-[#030308] text-white"
       >
         <HeroBackground />
-
-        {/* Mouse-tracked glow */}
         <motion.div
           className="pointer-events-none absolute h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/20 blur-[120px]"
           style={{ left: springX, top: springY, willChange: 'transform' }}
@@ -129,7 +151,6 @@ export default function EditableHero(): React.JSX.Element {
             transition={{ duration: 0.75, ease: 'easeOut' }}
             className="flex flex-col items-center gap-7"
           >
-            {/* Live badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -137,28 +158,28 @@ export default function EditableHero(): React.JSX.Element {
               className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/8 px-4 py-1.5"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
-                Live Trading Floor Active
-              </span>
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Live Trading Floor Active</span>
             </motion.div>
 
-            {/* Main headline */}
             <h1 className="max-w-4xl text-5xl font-bold leading-[1.06] tracking-tight sm:text-6xl lg:text-7xl">
-              <span className="block">{heroData.headline}</span>
-              <span className="relative block">
+              <span className="group block">
+                {heroData.headline}
+                <EditBtn field="headline" value={heroData.headline} />
+              </span>
+              <span className="group relative block">
                 <span className="relative z-10 bg-gradient-to-r from-violet-400 to-violet-300 bg-clip-text text-transparent font-bold">
                   {scrambled}
                 </span>
+                <EditBtn field="highlightedText" value={heroData.highlightedText} />
               </span>
               <span className="block text-zinc-500">Not What You Think.</span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg sm:leading-8">
+            <p className="group relative max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg sm:leading-8">
               {heroData.subheadline}
+              <EditBtn field="subheadline" value={heroData.subheadline} />
             </p>
 
-            {/* Feature tags */}
             <div className="flex flex-wrap justify-center gap-2">
               {tags.map(({ icon: Icon, label }, i) => (
                 <motion.div
@@ -174,36 +195,31 @@ export default function EditableHero(): React.JSX.Element {
               ))}
             </div>
 
-            {/* CTAs */}
             <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
-              <Link
-                to="/signup"
-                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(124,58,237,0.5)] transition hover:bg-violet-500 hover:shadow-[0_0_55px_rgba(124,58,237,0.65)]"
-              >
+              <a href="https://discord.gg/vrHwGxE3VA" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(124,58,237,0.5)] transition hover:bg-violet-500">
                 Get Access <ArrowUpRight size={16} />
-              </Link>
-              <Link
-                to="/course"
+              </a>
+              <button
+                type="button"
+                onClick={() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })}
                 className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Explore Course <ArrowRight size={16} />
-              </Link>
-            </div>
-
-            {/* Stats row */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-10 border-t border-white/[0.07] pt-8 w-full max-w-lg">
-              {stats.map((s) => (
-                <div key={s.label} className="text-center">
-                  <div className="text-2xl font-bold text-white">{s.value}</div>
-                  <div className="mt-1 text-[11px] uppercase tracking-widest text-zinc-500">{s.label}</div>
-                </div>
-              ))}
+              </button>
             </div>
           </motion.div>
         </section>
-
         <ScrollIndicator />
       </main>
-    </EditableWrapper>
+
+      {editingField && (
+        <HeroEditModal
+          field={editingField.field}
+          value={editingField.value}
+          onSave={handleSaveField}
+          onClose={() => setEditingField(null)}
+        />
+      )}
+    </>
   )
 }

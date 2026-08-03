@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { X, Lock, LogIn } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Lock, ArrowRight, X, Eye, EyeOff } from 'lucide-react'
 import { authAPI } from '@/services/api'
 
 interface AdminLoginProps {
@@ -8,31 +8,55 @@ interface AdminLoginProps {
   onLoginSuccess: () => void
 }
 
-export const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose, onLoginSuccess }) => {
+export function AdminLogin({ isOpen, onClose, onLoginSuccess }: AdminLoginProps) {
   const [secretKey, setSecretKey] = useState('')
+  const [showKey, setShowKey] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      setSecretKey('')
+      setError('')
+      setShowKey(false)
+      setTimeout(() => inputRef.current?.focus(), 80)
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const key = secretKey.trim()
+    if (!key) return
     setError('')
     setLoading(true)
-
     try {
-      const response = await authAPI.login(secretKey)
-      
-      // Store token in sessionStorage (not localStorage)
-      if (response.data.token) {
-        sessionStorage.setItem('adminToken', response.data.token)
+      const res = await authAPI.login(key)
+      if (res.data?.token) {
+        sessionStorage.setItem('adminToken', res.data.token)
+        setSecretKey('')
+        onLoginSuccess()
+        onClose()
+      } else {
+        setError('No token received. Please try again.')
       }
-      
-      setSecretKey('')
-      onLoginSuccess()
-      onClose()
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || err.message || 'Login failed'
-      console.error('Login error:', errorMsg)
-      setError(errorMsg)
+      if (!err.response) {
+        setError('Cannot reach server. Make sure the backend is running.')
+      } else if (err.response.status === 401) {
+        setError('Invalid secret key.')
+      } else if (err.response.status === 503) {
+        setError('Server is temporarily unavailable. Try again in a moment.')
+      } else {
+        setError(err.response?.data?.message || 'Login failed. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -41,103 +65,94 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ isOpen, onClose, onLogin
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-violet-600/30 rounded-full blur-3xl opacity-20"></div>
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-blue-600/20 rounded-full blur-3xl opacity-20"></div>
-      </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-sm bg-[#0d0d0d] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
 
-      <div className="relative w-full max-w-md">
-        <div className="relative bg-gradient-to-br from-[#1a1a2e] via-[#0d0d0d] to-[#0a0a0f] border border-white/10 rounded-2xl p-1 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 via-transparent to-blue-600/20 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
-
-          <div className="relative bg-[#0d0d0d]/95 rounded-2xl p-8 space-y-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-gradient-to-br from-violet-600 to-blue-600 rounded-lg">
-                  <Lock size={20} className="text-white" />
-                </div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-                  Admin Access
-                </h2>
+        <div className="p-8">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600">
+                <Lock size={16} className="text-white" />
               </div>
-              <p className="text-sm text-zinc-400">Enter your secret key to manage FXC</p>
+              <div>
+                <h2 className="text-base font-bold text-white tracking-tight">Admin Access</h2>
+                <p className="text-xs text-zinc-500 mt-0.5">FXC Dashboard</p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/8 rounded-lg transition-all"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-zinc-400 mb-2 uppercase tracking-widest">
+                Secret Key
+              </label>
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type={showKey ? 'text' : 'password'}
+                  value={secretKey}
+                  onChange={e => { setSecretKey(e.target.value); setError('') }}
+                  placeholder="Enter your secret key"
+                  autoComplete="off"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-11 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/60 focus:bg-white/8 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKey(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="flex items-start gap-2.5 px-3.5 py-3 bg-red-500/10 border border-red-500/25 rounded-xl">
+                <span className="text-red-400 text-xs leading-relaxed">{error}</span>
+              </div>
+            )}
 
             <button
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-              type="button"
-              title="Close"
+              type="submit"
+              disabled={loading || !secretKey.trim()}
+              className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white text-sm font-semibold py-3 rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(124,58,237,0.25)] hover:shadow-[0_0_30px_rgba(124,58,237,0.4)]"
             >
-              <X size={24} />
-            </button>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="relative group">
-                <label className="block text-sm font-semibold text-zinc-300 mb-2">
-                  Secret Key
-                </label>
-                <div className="relative">
-                  <input
-                    type="password"
-                    value={secretKey}
-                    onChange={(e) => setSecretKey(e.target.value)}
-                    placeholder="Paste your secret key here"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500/50 focus:bg-white/10 transition-all"
-                  />
-                  <Lock className="absolute right-3 top-3 text-zinc-600 group-focus-within:text-violet-500 transition-colors" size={20} />
-                </div>
-              </div>
-
-              {error && (
-                <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg backdrop-blur-sm">
-                  <p className="text-red-300 text-sm font-medium">{error}</p>
-                </div>
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  Enter Dashboard
+                  <ArrowRight size={15} />
+                </>
               )}
+            </button>
+          </form>
 
-              <button
-                type="submit"
-                disabled={loading || !secretKey.trim()}
-                className="w-full relative group overflow-hidden rounded-lg py-3 font-semibold transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-blue-600 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-violet-600/50"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                <div className="relative flex items-center justify-center gap-2 text-white">
-                  <LogIn size={18} />
-                  {loading ? 'Verifying...' : 'Enter Dashboard'}
-                </div>
-                {(loading || !secretKey.trim()) && (
-                  <div className="absolute inset-0 bg-black/20"></div>
-                )}
-              </button>
-
-              <div className="pt-2">
-                <p className="text-xs text-zinc-500 text-center leading-relaxed">
-                  🔐 Your access key is verified against our secure database
-                </p>
-              </div>
-            </form>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10"></div>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-[#0d0d0d] text-zinc-600">FXC Admin Portal</span>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-center">
-              <p className="text-xs text-zinc-500">
-                Unauthorized access attempts are logged
-              </p>
-              <div className="flex items-center justify-center gap-1 text-xs text-zinc-600">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                Server connected
-              </div>
-            </div>
-          </div>
+          {/* Footer */}
+          <p className="mt-6 text-center text-[11px] text-zinc-600">
+            Key is verified against the secure database
+          </p>
         </div>
       </div>
     </div>

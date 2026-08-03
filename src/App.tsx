@@ -9,7 +9,10 @@ import { EditModal } from "@/components/EditModal";
 import { useAdmin } from "@/context/AdminContext";
 import { authAPI } from "@/services/api";
 
-const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (value: boolean) => void }> = ({ isAdminLoggedIn, setIsAdminLoggedIn }) => {
+const AppContent: React.FC<{
+  isAdminLoggedIn: boolean;
+  setIsAdminLoggedIn: (value: boolean) => void;
+}> = ({ isAdminLoggedIn, setIsAdminLoggedIn }) => {
   const { editingItem, setEditingItem, setIsAdminMode } = useAdmin();
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 
@@ -25,6 +28,7 @@ const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (valu
   const handleLogout = () => {
     setIsAdminLoggedIn(false);
     sessionStorage.removeItem('adminToken');
+    sessionStorage.removeItem('isAdminMode');
     setEditingItem(null);
   };
 
@@ -42,10 +46,10 @@ const AppContent: React.FC<{ isAdminLoggedIn: boolean; setIsAdminLoggedIn: (valu
         itemData={editingItem?.data}
       />
       <Routes>
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            <MainLayout 
+            <MainLayout
               onAdminClick={() => setShowAdminLogin(true)}
               onLogout={handleLogout}
             />
@@ -63,17 +67,19 @@ const App: React.FC = () => {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await authAPI.verify();
-        if (response.data.valid) {
-          setIsAdminLoggedIn(true);
-        }
-      } catch (error) {
+    const token = sessionStorage.getItem('adminToken');
+    if (!token) return; // No token — skip verify call entirely
+
+    authAPI.verify()
+      .then((response) => {
+        if (response.data.valid) setIsAdminLoggedIn(true);
+      })
+      .catch(() => {
+        // Token invalid or expired — clear it
+        sessionStorage.removeItem('adminToken');
+        sessionStorage.removeItem('isAdminMode');
         setIsAdminLoggedIn(false);
-      }
-    };
-    checkAuth();
+      });
   }, []);
 
   return (
