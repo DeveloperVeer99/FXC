@@ -75,10 +75,10 @@ export default function AnnouncementBar() {
     bannerAPI.get().then(r => {
       const d = r.data
       setData({
-        text: d.text || defaultData.text,
-        ctaText: d.ctaText || defaultData.ctaText,
-        ctaLink: d.ctaLink || defaultData.ctaLink,
-        message: d.message || defaultData.message,
+        text: d.text !== undefined ? d.text : defaultData.text,
+        ctaText: d.ctaText !== undefined ? d.ctaText : defaultData.ctaText,
+        ctaLink: d.ctaLink !== undefined ? d.ctaLink : defaultData.ctaLink,
+        message: d.message !== undefined ? d.message : defaultData.message,
         isActive: d.isActive !== false,
       })
     }).catch(() => {})
@@ -109,15 +109,17 @@ export default function AnnouncementBar() {
   const tickerItems = Array.from({ length: 8 }, (_, i) => (
     <span key={i} className="inline-flex items-center gap-3 px-6">
       <span className="h-1 w-1 rounded-full bg-white/40" />
-      <span className="font-semibold tracking-wide">{data.text}</span>
-      <button
-        type="button"
-        onClick={handleCtaClick}
-        className="rounded bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-700 hover:bg-violet-100 transition-colors cursor-pointer"
-      >
-        {data.ctaText}
-      </button>
-      <span className="text-white/60 text-xs hidden sm:inline">{data.message}</span>
+      {data.text && <span className="font-semibold tracking-wide">{data.text}</span>}
+      {data.ctaText && (
+        <button
+          type="button"
+          onClick={handleCtaClick}
+          className="rounded bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-700 hover:bg-violet-100 transition-colors cursor-pointer"
+        >
+          {data.ctaText}
+        </button>
+      )}
+      {data.message && <span className="text-white/60 text-xs hidden sm:inline">{data.message}</span>}
     </span>
   ))
 

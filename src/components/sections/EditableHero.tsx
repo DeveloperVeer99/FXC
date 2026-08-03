@@ -198,7 +198,7 @@ export default function EditableHero(): React.JSX.Element {
             <div className="flex flex-wrap items-center justify-center gap-3 mt-1">
               <button
                 type="button"
-                onClick={() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                 className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(124,58,237,0.5)] transition hover:bg-violet-500"
               >
                 Explore Course <ArrowRight size={16} />

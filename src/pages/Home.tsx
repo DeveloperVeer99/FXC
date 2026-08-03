@@ -14,15 +14,13 @@ export default function Home(): React.JSX.Element {
       <EditableHero />
       <section id="courses">
         <EditableTradingEcosystem />
+        <EditablePlansPricing />
         <EditableCurriculum />
         <EditableProMentorship />
       </section>
       <section id="community">
         <EditableTradingCommunity />
         <EditableTestimonials />
-      </section>
-      <section id="plans">
-        <EditablePlansPricing />
       </section>
       <section id="banner">
         <EditableBanner />
