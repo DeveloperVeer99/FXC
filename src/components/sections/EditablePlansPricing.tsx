@@ -11,6 +11,7 @@ interface Course {
   price: number
   description: string
   cta: string
+  paymentType?: string
   highlights?: string[]
   accent?: boolean
   isActive: boolean
@@ -52,6 +53,8 @@ function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>;
           </div>
           <div><label className="text-xs text-zinc-400 mb-1 block">CTA Button</label>
             <input value={data.cta || ''} onChange={e => setData({ ...data, cta: e.target.value })} className={inp} /></div>
+          <div><label className="text-xs text-zinc-400 mb-1 block">Payment Type</label>
+            <input value={data.paymentType || ''} onChange={e => setData({ ...data, paymentType: e.target.value })} className={inp} placeholder="e.g. one-time payment" /></div>
           <div><label className="text-xs text-zinc-400 mb-1 block">Highlights (one per line)</label>
             <textarea value={(data.highlights || []).join('\n')} onChange={e => setData({ ...data, highlights: e.target.value.split('\n').filter(h => h.trim()) })} rows={4} className={`${inp} font-mono text-xs`} /></div>
           <div className="flex items-center gap-2">
@@ -151,7 +154,7 @@ function BuyModal({ course, onClose }: { course: Course; onClose: () => void }) 
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-white/8 shrink-0">
           <div>
             <h3 className="text-white font-bold text-lg">{course.title}</h3>
-            <p className="text-violet-400 font-semibold text-sm mt-0.5">₹{course.price} — one-time payment</p>
+            <p className="text-violet-400 font-semibold text-sm mt-0.5">₹{course.price} — {course.paymentType || 'one-time payment'}</p>
           </div>
           <button onClick={onClose} className="text-zinc-500 hover:text-white transition"><X size={18} /></button>
         </div>
@@ -272,9 +275,9 @@ function SpotlightCard({ course, isAdminMode, onEdit, onDelete, onEditHighlight,
   return (
     <motion.div ref={cardRef} onMouseMove={handleMouseMove} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
-      className={`relative rounded-xl border p-8 overflow-hidden group/card ${course.accent ? 'border-violet-500/40 bg-[#0d0d0d]' : 'border-white/[0.08] bg-[#0d0d0d]'}`}
+      className={`relative rounded-xl border p-8 overflow-hidden group/card ${course.accent ? 'border-violet-500/40 bg-[#0d0d0d]' : 'border-white/8 bg-[#0d0d0d]'}`}
     >
-      {course.accent && <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />}
+      {course.accent && <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-violet-500 to-transparent" />}
       {isAdminMode && (
         <div className="absolute top-3 right-3 flex gap-1.5 z-20 opacity-0 group-hover/card:opacity-100 transition-all">
           <button onClick={onEdit} className="flex items-center gap-1 px-2 py-1 bg-violet-600/90 hover:bg-violet-600 text-white text-xs font-semibold rounded"><Edit2 size={11} /> Edit</button>
@@ -288,17 +291,17 @@ function SpotlightCard({ course, isAdminMode, onEdit, onDelete, onEditHighlight,
             <p className="text-lg font-semibold text-white">{course.title}</p>
             <p className="mt-2 text-sm text-zinc-400">{course.description}</p>
           </div>
-          {course.label && <span className="flex-shrink-0 rounded border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-400">{course.label}</span>}
+          {course.label && <span className="shrink-0 rounded border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-400">{course.label}</span>}
         </div>
         <div className="mt-8">
           <div className="text-4xl font-bold text-white">₹{course.price}</div>
-          <p className="mt-1 text-xs text-zinc-500 uppercase tracking-widest">one-time payment</p>
+          <p className="mt-1 text-xs text-zinc-500 uppercase tracking-widest">{course.paymentType || 'one-time payment'}</p>
         </div>
         {course.highlights && course.highlights.length > 0 && (
           <ul className="mt-8 space-y-3">
             {course.highlights.map((h, hi) => (
               <li key={hi} className="flex items-start gap-3 text-sm text-zinc-300 group/hl">
-                <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-violet-500/30 bg-violet-500/10">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-violet-500/30 bg-violet-500/10">
                   <Check className="h-3 w-3 text-violet-400" strokeWidth={2.5} />
                 </span>
                 <span className="flex-1">{h}</span>
@@ -386,7 +389,7 @@ export default function EditablePlansPricing() {
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">Plans & Pricing</h2>
             <p className="mt-4 text-base text-zinc-400">Pick the plan that matches your trading goals.</p>
             {isAdminMode && (
-              <button onClick={() => setEditingCourse({ title: '', price: 0, description: '', cta: 'Get Started', label: '', highlights: [], accent: false, isActive: true })}
+              <button onClick={() => setEditingCourse({ title: '', price: 0, description: '', cta: 'Get Started', paymentType: 'one-time payment', label: '', highlights: [], accent: false, isActive: true })}
                 className="mt-6 inline-flex items-center gap-2 rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition">
                 <Plus size={16} /> Add Course
               </button>
