@@ -6,7 +6,7 @@ import { useAdmin } from '../../context/AdminContext'
 const navLinks = [
   { label: 'Course', id: 'courses' },
   { label: 'Community', id: 'community' },
-  { label: 'Pricing', id: 'plans' },
+  { label: 'Pricing', id: 'pricing' },
 ]
 
 interface NavbarProps {

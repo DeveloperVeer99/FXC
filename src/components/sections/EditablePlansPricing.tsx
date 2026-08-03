@@ -16,9 +16,25 @@ interface Course {
   isActive: boolean
 }
 
-function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>; onSave: (d: Partial<Course>) => void; onClose: () => void }) {
+function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>; onSave: (d: Partial<Course>) => Promise<void>; onClose: () => void }) {
   const [data, setData] = useState({ ...course })
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const inp = 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white text-sm focus:outline-none focus:border-violet-500'
+
+  const handleSave = async () => {
+    if (!data.title?.trim()) { setError('Title is required'); return }
+    if (!data.description?.trim()) { setError('Description is required'); return }
+    setSaving(true)
+    setError('')
+    try {
+      await onSave(data)
+    } catch (e: any) {
+      setError(e?.response?.data?.message || e?.message || 'Failed to save. Check you are logged in as admin.')
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-zinc-900 border border-violet-500/30 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
@@ -30,7 +46,7 @@ function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>;
             <textarea value={data.description || ''} onChange={e => setData({ ...data, description: e.target.value })} rows={2} className={inp} /></div>
           <div className="grid grid-cols-2 gap-3">
             <div><label className="text-xs text-zinc-400 mb-1 block">Price (₹)</label>
-              <input type="number" value={data.price || 0} onChange={e => setData({ ...data, price: parseFloat(e.target.value) })} className={inp} /></div>
+              <input type="number" value={data.price ?? 0} onChange={e => setData({ ...data, price: parseFloat(e.target.value) || 0 })} className={inp} /></div>
             <div><label className="text-xs text-zinc-400 mb-1 block">Label</label>
               <input value={data.label || ''} onChange={e => setData({ ...data, label: e.target.value })} className={inp} placeholder="e.g. Popular" /></div>
           </div>
@@ -43,8 +59,11 @@ function CourseEditModal({ course, onSave, onClose }: { course: Partial<Course>;
             <label htmlFor="accent" className="text-sm text-zinc-400 cursor-pointer">Featured Course</label>
           </div>
         </div>
+        {error && <div className="mt-3 px-3 py-2 bg-red-500/15 border border-red-500/30 rounded text-red-400 text-xs">{error}</div>}
         <div className="flex gap-2 mt-4">
-          <button onClick={() => onSave(data)} className="flex-1 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold py-2 rounded transition flex items-center justify-center gap-1"><Save size={14} /> Save</button>
+          <button onClick={handleSave} disabled={saving} className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-700 text-white text-sm font-semibold py-2 rounded transition flex items-center justify-center gap-1">
+            {saving ? <><span className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" /> Saving...</> : <><Save size={14} /> Save</>}
+          </button>
           <button onClick={onClose} className="flex-1 border border-zinc-600 hover:bg-zinc-800 text-white text-sm font-semibold py-2 rounded transition">Cancel</button>
         </div>
       </div>
@@ -148,11 +167,13 @@ export default function EditablePlansPricing() {
     coursesAPI.getAll().then(r => setCourses(r.data || [])).catch(() => {}).finally(() => setLoading(false))
   }, [dataSaved, sectionSaved['courses']])
 
-  const handleSaveCourse = async (data: Partial<Course>) => {
-    try {
-      if (data._id) { await coursesAPI.update(data._id, data) } else { await coursesAPI.create(data) }
-      triggerDataRefresh('courses')
-    } catch (e) { console.error(e) }
+  const handleSaveCourse = async (data: Partial<Course>): Promise<void> => {
+    if (data._id) {
+      await coursesAPI.update(data._id, data)
+    } else {
+      await coursesAPI.create(data)
+    }
+    triggerDataRefresh('courses')
     setEditingCourse(null)
   }
 
