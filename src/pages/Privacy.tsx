@@ -23,7 +23,7 @@ export default function Privacy() {
           <div className="inline-flex items-center gap-2 rounded-md border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 mb-4">
             <span className="text-xs font-semibold uppercase tracking-widest text-violet-300">Legal</span>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white">Privacy Policy</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Privacy Policy</h1>
           <p className="mt-3 text-sm text-zinc-500">Last updated: 2026</p>
         </div>
         <div className="space-y-8">
