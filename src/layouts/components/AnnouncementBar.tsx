@@ -6,6 +6,7 @@ import { bannerAPI } from '../../services/api'
 interface BannerData {
   text: string
   ctaText: string
+  ctaLink: string
   message: string
   isActive: boolean
 }
@@ -13,6 +14,7 @@ interface BannerData {
 const defaultData: BannerData = {
   text: 'Limited Seats Available',
   ctaText: 'Enroll Now',
+  ctaLink: '#pricing',
   message: 'Only a few spots left this batch',
   isActive: true,
 }
@@ -39,6 +41,10 @@ function EditModal({ data, onSave, onClose }: {
           <div>
             <label className="text-xs text-zinc-400 mb-1 block">CTA Badge Text</label>
             <input value={val.ctaText} onChange={e => setVal(v => ({ ...v, ctaText: e.target.value }))} className={inp} placeholder="Enroll Now" />
+          </div>
+          <div>
+            <label className="text-xs text-zinc-400 mb-1 block">CTA Link (e.g. #pricing or https://...)</label>
+            <input value={val.ctaLink} onChange={e => setVal(v => ({ ...v, ctaLink: e.target.value }))} className={inp} placeholder="#pricing" />
           </div>
           <div>
             <label className="text-xs text-zinc-400 mb-1 block">Sub-message</label>
@@ -71,6 +77,7 @@ export default function AnnouncementBar() {
       setData({
         text: d.text || defaultData.text,
         ctaText: d.ctaText || defaultData.ctaText,
+        ctaLink: d.ctaLink || defaultData.ctaLink,
         message: d.message || defaultData.message,
         isActive: d.isActive !== false,
       })
@@ -89,8 +96,13 @@ export default function AnnouncementBar() {
   // In admin mode always show so it can be edited; otherwise respect isActive
   if (!data.isActive && !isAdminMode) return null
 
-  const scrollToCourses = () => {
-    document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })
+  const handleCtaClick = () => {
+    const link = data.ctaLink || '#pricing'
+    if (link.startsWith('#')) {
+      document.getElementById(link.slice(1))?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      window.open(link, '_blank', 'noopener noreferrer')
+    }
   }
 
   // Build the repeating ticker content
@@ -100,7 +112,7 @@ export default function AnnouncementBar() {
       <span className="font-semibold tracking-wide">{data.text}</span>
       <button
         type="button"
-        onClick={scrollToCourses}
+        onClick={handleCtaClick}
         className="rounded bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-700 hover:bg-violet-100 transition-colors cursor-pointer"
       >
         {data.ctaText}
